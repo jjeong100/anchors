@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>Project</groupId>
-  <artifactId>sample</artifactId>
+  <artifactId>anchors</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
@@ -12,7 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <postgresql.version>9.4-1200-jdbc41</postgresql.version>
+<!--    <postgresql.version>9.4-1200-jdbc41</postgresql.version>-->
+ <postgresql.version>42.2.22</postgresql.version>
      <gson.version>2.6.2</gson.version>
       <mybatis-spring.version>1.2.0</mybatis-spring.version>
       <org.springframework-version>4.3.10.RELEASE</org.springframework-version>
