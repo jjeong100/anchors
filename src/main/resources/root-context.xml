@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+     <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/properties/globals.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${Globals.DataBase.DriverClassName}"/>
+        <property name="url" value="${Globals.DataBase.Url}" />
+        <property name="username" value="${Globals.DataBase.UserName}"/>
+        <property name="password" value="${Globals.DataBase.Password}"/>
+        
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="5" />
+        <property name="maxWait" value="10000" />
+        <property name="maxIdle" value="5" />
+        <property name="minIdle" value="5" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="true" />
+        <!--  <property name="validationQuery" value="select 1 " /> -->
+        <property name="testWhileIdle" value="true" />
+        <property name="timeBetweenEvictionRunsMillis" value="130000" />
+        <property name="minEvictableIdleTimeMillis" value="120000" />
+        <property name="numTestsPerEvictionRun" value="20" />
+        <property name="removeAbandonedTimeout" value="30" />
+        <property name="removeAbandoned" value="true" />
+        <property name="logAbandoned" value="false" />
+    </bean>
+    
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"></property>       
+      <property name="configLocation" value="classpath:/mybatisConfig/mybatisConfig.xml"></property>  
+  <!-- 런타임 시 SqlSessionFactory에 MyBatis mapper 파일들의 경로가 설정된다. -->
+   <property name="mapperLocations" value="classpath:/com/edu/mapper/**/*.xml" />
+    </bean>       
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+     <constructor-arg ref="sqlSessionFactory">
+     </constructor-arg>    
+    </bean>
+</beans>

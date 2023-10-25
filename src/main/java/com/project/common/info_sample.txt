@@ -1,0 +1,15 @@
+// 커넥션 종료 ;
+/**
+     * 
+     */
+    public void Process(String tableName,boolean isMatching) {
+        Connection conn = PostgreSql.Connection("kd_mes","local");
+        
+        try {
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }finally {
+             try{if(conn != null) {conn.close();}}catch(Exception e) {e.printStackTrace();} 
+        }
+    }

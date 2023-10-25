@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mcc908">
+
+    <select id="select" parameterType="org.rnt.com.entity.vo.ProductionStatusVO" resultType="org.rnt.com.entity.vo.ProductionStatusVO">
+        SELECT
+             FACTORY_CD
+            ,WORKACT_SEQ
+            ,PROD_SEQ
+            ,OPER_CD
+            ,OPER_SEQ
+            ,BOM_LEVEL
+            ,OPER_UPCD
+            ,OPER_UPCD_SEQ
+            ,OPER_TOPCD
+            ,OPER_TOPCD_SEQ
+            ,ITEM_CD
+            ,BOM_VER
+            ,BOM_STDT
+            ,OUTCUST_YN
+            ,CUST_CD
+            ,OUTSIDE_OUTDT
+            ,OUTSIDE_INDT
+            ,MOLD_CD
+            ,MOLD_SEQ
+            ,EQUIP_CD
+            ,EQUIP_SEQ
+            ,WORK_DT
+            ,WORKST_DT
+            ,WORKED_DT
+            ,PROD_TYPE_CD
+            ,SABUN_ID
+            ,COALESCE(PO_QTY,0) AS PO_QTY
+            ,COALESCE(ACTOK_QTY,0) AS ACTOK_QTY
+            ,COALESCE(ACTBAD_QTY,0) AS ACTBAD_QTY
+            ,BAD_CD
+            ,WORKACT_BIGO
+            ,CONFIRM_YN
+            ,USE_YN
+            ,WRITE_DT
+            ,WRITE_ID
+            ,UPDATE_DT
+            ,UPDATE_ID
+        FROM MCC907 A
+        WHERE 1=1 
+          AND FACTORY_CD = #{factoryCd}
+          AND WORKACT_SEQ = #{workactSeq}
+    </select>
+    
+    <update id="update" parameterType="org.rnt.com.entity.vo.ProductionStatusVO">
+        UPDATE MCC907
+        SET  UPDATE_DT = NOW()
+            ,UPDATE_ID = #{updateId}
+            <if test="prodSeq != null">,PROD_SEQ = #{prodSeq}</if>
+            <if test="operCd != null">,OPER_CD = #{operCd}</if>
+            <if test="operSeq != null">,OPER_SEQ = #{operSeq}</if>
+            <if test="bomLevel != null">,BOM_LEVEL = #{bomLevel}</if>
+            <if test="operUpcd != null">,OPER_UPCD = #{operUpcd}</if>
+            <if test="operUpcdSeq != null">,OPER_UPCD_SEQ = #{operUpcdSeq}</if>
+            <if test="operTopcd != null">,OPER_TOPCD = #{operTopcd}</if>
+            <if test="operTopcdSeq != null">,OPER_TOPCD_SEQ = #{operTopcdSeq}</if>
+            <if test="itemCd != null">,ITEM_CD = #{itemCd}</if>
+            <if test="bomVer != null">,BOM_VER = #{bomVer}</if>
+            <if test="bomStdt != null">,BOM_STDT = #{bomStdt}</if>
+            <if test="outcustYn != null">,OUTCUST_YN = #{outcustYn}</if>
+            <if test="custCd != null">,CUST_CD = #{custCd}</if>
+            <if test="outsideOutdt != null">,OUTSIDE_OUTDT = #{outsideOutdt}</if>
+            <if test="outsideIndt != null">,OUTSIDE_INDT = #{outsideIndt}</if>
+            <if test="moldCd != null">,MOLD_CD = #{moldCd}</if>
+            <if test="moldSeq != null">,MOLD_SEQ = #{moldSeq}</if>
+            <if test="equipCd != null">,EQUIP_CD = #{equipCd}</if>
+            <if test="equipSeq != null">,EQUIP_SEQ = #{equipSeq}</if>
+            <if test="workDt != null or prodTypeCd == 'END' or prodTypeCd == 'CAN'">,WORK_DT = TO_CHAR(now(),'YYYYMMDD')</if>
+            <if test="workstDt != null or prodTypeCd == 'END' or prodTypeCd == 'CAN'">,WORKST_DT = TO_CHAR(now(),'YYYYMMDDHH24MMSS')</if>
+            <if test="workedDt != null">,WORKED_DT = TO_CHAR(now(),'YYYYMMDDHH24MMSS')</if>
+            <if test="prodTypeCd != null">,PROD_TYPE_CD = #{prodTypeCd}</if>
+            <if test="sabunId != null">,SABUN_ID = #{sabunId}</if>
+            <if test="poQty != null">,PO_QTY = #{poQty}</if>
+            <if test="actokQty != null">,ACTOK_QTY = #{actokQty}</if>
+            <if test="actbadQty != null">,ACTBAD_QTY = #{actbadQty}</if>
+            <if test="badCd != null">,BAD_CD = #{badCd}</if>
+            <if test="workactBigo != null">,WORKACT_BIGO = #{workactBigo}</if>
+            <if test="confirmYn != null">,CONFIRM_YN = #{confirmYn}</if>
+            <if test="useYn != null">,USE_YN = #{useYn}</if>
+        WHERE 1=1
+          AND FACTORY_CD = #{factoryCd}
+          AND WORKACT_SEQ = #{workactSeq}
+    
+    </update>
+
+    <update id="delete" parameterType="org.rnt.com.entity.vo.ProductionStatusVO">
+        UPDATE MCC907
+        SET  UPDATE_DT = NOW()
+            ,UPDATE_ID = #{updateId}
+            ,USE_YN = 'N'
+        WHERE 1=1
+          AND FACTORY_CD = #{factoryCd}
+          AND WORKACT_SEQ = #{workactSeq}
+    </update>
+    
+    <select id="searchList" parameterType="org.rnt.com.entity.vo.ProductionStatusVO" resultType="org.rnt.com.entity.vo.ProductionStatusVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY WRITE_DT DESC) AS RNUM
+               , PLC_HIS_SEQ
+               , PLC_CD
+               , PLC_TYPE_CD
+               , PLC_STATUS_CD
+               , PROD_SEQ
+               , DATA1
+                  , DATA2
+                  , DATA3
+                  , WRITE_DT
+                  , TO_CHAR(WRITE_DT, 'YYYY/MM/DD HH24:MI:SS') AS WRITE_DATE 
+            FROM (SELECT PLC_HIS_SEQ
+                       , PLC_CD
+                       , PLC_TYPE_CD
+                       , PLC_STATUS_CD
+                       , PROD_SEQ
+                       , CAST( REGEXP_REPLACE(DATA1, '\s', '', 'g') AS INTEGER ) AS DATA1
+                       , CAST( REGEXP_REPLACE(DATA2, '\s', '', 'g') AS INTEGER ) AS DATA2
+                       , CAST( REGEXP_REPLACE(DATA3, '\s', '', 'g') AS INTEGER ) AS DATA3
+                       , DENSE_RANK() OVER( PARTITION BY DATA1, DATA2, DATA3 ORDER BY WRITE_DT DESC ) AS GROUP_RNUM
+                       , WRITE_DT 
+                    FROM MCC908 
+                   WHERE 1=1
+                     AND PLC_CD = '1'--'EQUIPMENT1' 
+                     AND PLC_TYPE_CD = 'P'
+                     AND REGEXP_REPLACE(DATA1, '\s+$', '') != ''
+                     <if test="prodSeq != null and prodSeq != ''">
+                     AND PROD_SEQ = #{prodSeq}
+                     </if>
+                     <if test="workDt != null and workDt != ''">
+                     AND WRITE_DT BETWEEN TO_TIMESTAMP(#{workDt}||'000000','YYYYMMDDHH24MISS') AND TO_TIMESTAMP(#{workDt}||'235959','YYYYMMDDHH24MISS')
+                     </if> ) A 
+           WHERE GROUP_RNUM = 1
+           <!-- LIMIT 10 -->
+    </select>
+    
+    <select id="searchList2_backup" parameterType="org.rnt.com.entity.vo.ProductionStatusVO" resultType="org.rnt.com.entity.vo.ProductionStatusVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY WRITE_DT DESC) AS RNUM
+             , PLC_HIS_SEQ
+             , WORK_CNT
+             , ERR_CNT
+             , WORK_CNT - PRE_WORK_CNT AS NOW_WORK_CNT
+             , ERR_CNT - PRE_ERR_CNT AS NOW_ERR_CNT
+             , WRITE_DT
+             , TO_CHAR(WRITE_DT, 'YYYY/MM/DD HH24:MI:SS') AS WRITE_DATE 
+          FROM (
+                SELECT PLC_HIS_SEQ,WORK_CNT
+                     , ERR_CNT
+                     , SUM(WORK_CNT) OVER (PARTITION BY WORK_CNT ORDER BY WRITE_DT) AS WORK_CNT_SUM
+                     , SUM(ERR_CNT) OVER (PARTITION BY ERR_CNT ORDER BY WRITE_DT) AS ERR_CNT_SUM
+                     , COALESCE( LEAD(WORK_CNT, -1) OVER (ORDER BY WRITE_DT), 0) AS PRE_WORK_CNT
+                     , COALESCE( LEAD(ERR_CNT, -1) OVER (ORDER BY WRITE_DT), 0) AS PRE_ERR_CNT
+                     , WRITE_DT
+                 FROM (
+                        SELECT   PLC_HIS_SEQ, 
+                             PLC_CD, 
+                             WORK_CNT, 
+                             ERR_CNT,
+                             DENSE_RANK() OVER(PARTITION BY WORK_CNT, ERR_CNT ORDER BY WRITE_DT ASC) AS GROUP_NUM,
+                             WRITE_DT 
+                        FROM     MCC908 
+                        WHERE    1=1
+                        -- EQUIP_CD = equipCd
+                        AND      PROD_SEQ = #{prodSeq}
+                        AND      WRITE_DT BETWEEN TO_TIMESTAMP(#{workDt}||'000000','YYYYMMDDHH24MISS') AND TO_TIMESTAMP(#{workDt}||'235959','YYYYMMDDHH24MISS')
+                        ORDER BY WRITE_DT ASC
+                     ) A
+                 WHERE GROUP_NUM = 1
+                 ) B
+         ORDER BY WRITE_DT DESC
+         LIMIT 200
+    </select>
+    
+    <select id="searchList2" parameterType="org.rnt.com.entity.vo.ProductionStatusVO" resultType="org.rnt.com.entity.vo.ProductionStatusVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY WRITE_DT DESC) AS RNUM
+             , PLC_HIS_SEQ
+             , WORK_CNT
+             , ERR_CNT
+             , PRE_WORK_CNT AS NOW_WORK_CNT
+             , PRE_ERR_CNT AS NOW_ERR_CNT
+             , WRITE_DT
+             , TO_CHAR(WRITE_DT, 'YYYY/MM/DD HH24:MI:SS') AS WRITE_DATE 
+          FROM
+        (SELECT    PLC_HIS_SEQ
+             , PLC_CD
+             , (SELECT SUM(WORK_CNT)  FROM MCC908 WHERE PROD_SEQ = A.PROD_SEQ) AS WORK_CNT 
+                 , (SELECT SUM(ERR_CNT)   FROM MCC908 WHERE PROD_SEQ = A.PROD_SEQ) AS ERR_CNT
+             , COALESCE( LEAD(WORK_CNT, -1) OVER (ORDER BY WRITE_DT),0) AS PRE_WORK_CNT
+             , COALESCE( LEAD(ERR_CNT, -1) OVER (ORDER BY WRITE_DT),0) AS PRE_ERR_CNT
+            
+             , DENSE_RANK() OVER(PARTITION BY WORK_CNT, ERR_CNT ORDER BY WRITE_DT ASC) AS GROUP_NUM
+             , WRITE_DT
+        
+        FROM     MCC908 A
+        WHERE    1=1
+        AND      PROD_SEQ = #{prodSeq}
+        AND      WRITE_DT BETWEEN TO_TIMESTAMP(#{workDt}||'000000','YYYYMMDDHH24MISS') AND TO_TIMESTAMP(#{workDt}||'235959','YYYYMMDDHH24MISS')
+        ORDER BY WRITE_DT DESC) A
+    </select>
+
+    <select id="searchListTotCnt" parameterType="org.rnt.com.entity.vo.ProductionStatusVO" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS TOT_CNT
+        FROM (SELECT PLC_HIS_SEQ
+                   , PLC_CD
+                   , CAST( REGEXP_REPLACE(WORK_CNT, '\s', '', 'g') AS INTEGER ) AS WORK_CNT
+                   , CAST( REGEXP_REPLACE(ERR_CNT, '\s', '', 'g') AS INTEGER ) AS ERR_CNT
+                   , DENSE_RANK() OVER( PARTITION BY WORK_CNT, ERR_CNT ORDER BY WRITE_DT DESC ) AS ROW_NUM
+                   , WRITE_DT 
+                FROM MCC908 
+               WHERE 1=1
+                  -- EQUIP_CD = equipCd
+                 AND REGEXP_REPLACE(WORK_CNT, '\s+$', '') != ''
+                 <if test="searchProdSeq != null and searchProdSeq != ''">
+           AND PROD_SEQ = #{searchProdSeq}
+           </if>
+           <if test="searchFromDate != null and searchFromDate != ''">
+           AND WRITE_DT BETWEEN TO_TIMESTAMP(#{searchFromDate}||'000000','YYYYMMDDHH24MISS') AND TO_TIMESTAMP(#{searchToDate}||'235959','YYYYMMDDHH24MISS')
+                 </if> ) A 
+       WHERE ROW_NUM = 1 
+    </select>
+</mapper>
