@@ -1,0 +1,75 @@
+                created
+                , created_by
+                , last_upd
+                , last_upd_by
+                , reason
+                , level1
+                , level2
+                , level3
+                , level4
+                , source
+                , method
+                , description
+                , status
+                , priority
+                , solution    
+                , serialnumber
+                , contactid
+                , accountid
+                , tendency
+                , satisfaction
+                , dealerid
+                , causingarea
+                , imobilizationdate
+                , relatedmodel
+                , quotedescription
+                , enginetransmission
+                , version
+                , versionprice
+                , color
+                , colorprice
+                , finalprice
+                , carreplacementintention
+                , roadservicerequest
+                , integrationid
+                , CASE when srww.tdconfirmed='Y' then true when srww.tdconfirmed='N' then false else null end tdconfirmed
+                , tdtime
+                , tddate
+                , salesrepid
+                , CASE when srww.pneflag='Y' then true when srww.pneflag='N' then false else null end pneflag
+                , campaignid
+                , sourcetag
+                , estoque
+                , medium
+                , content
+                , campaign
+                , additionalcomments
+                , causingperson
+                , custrepresentative
+                , custrepresentativerel
+                , CASE when srww.diagnosisdifficultyflg='Y' then true when srww.diagnosisdifficultyflg='N' then false else null end diagnosisdifficultyflg
+                , CASE when srww.diagnosispendingflg='Y' then true when srww.diagnosispendingflg='N' then false else null end diagnosispendingflg
+                , dlrfup
+                , dlrpending
+                , CASE when srww.dlrretractionflg='Y' then true when srww.dlrretractionflg='N' then false else null end dlrretractionflg
+                , dlrreversal
+                , CASE when srww.hotlineflg='Y' then true when srww.hotlineflg='N' then false else null end hotlineflg
+                , hotlinenum
+                , hotlineopendt
+                , purchaseproposalnum
+                , CASE when srww.pwaflg='Y' then true when srww.pwaflg='N' then false else null end pwaflg
+                , pwanum
+                , pwaopendt
+                , CASE when srww.recurrenceflg='Y' then true when srww.recurrenceflg='N' then false else null end recurrenceflg
+                , recurrencenum
+                , vehicledeliverydt
+                , CASE when srww.vehicledeliveryflg='Y' then true when srww.vehicledeliveryflg='N' then false else null end vehicledeliveryflg
+                , CASE when srww.anonymousflag='Y' then true when srww.anonymousflag='N' then false else null end anonymousflag
+                , dlrdescription
+                , CASE when srww.wantsloan='Y' then true when srww.wantsloan='N' then false else null end wantsloan
+                , loantype
+                , installmentsamt
+                , downpayment
+                , CASE when srww.usedcarasdownpaymnt='Y' then true when srww.usedcarasdownpaymnt='N' then false else null end usedcarasdownpaymnt
+                , dlrtemperature
+                , row_id
