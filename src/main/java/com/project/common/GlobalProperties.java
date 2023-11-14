@@ -36,7 +36,7 @@ public class GlobalProperties {
 //	}
 	
 	public static String getProperties(String name) {
-		String default_path = "D:\\workspace\\anchors\\anchors\\src\\main\\java\\com\\project\\properties\\globals.properties";
+		String default_path = "D:\\project\\anchors\\src\\main\\java\\com\\project\\properties\\globals.properties";
 		return getProperties(default_path,name);
 	}
 	/*

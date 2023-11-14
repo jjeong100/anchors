@@ -1,0 +1,32 @@
+        
+        
+        Object
+integrationId       Char
+cnpjNumber  Key Char
+name        Char
+nickname        Char
+parentAccountName       Char
+agencyCode      Char
+fleetAccontType     Char
+industryTrend       Char
+numberOfEmployee        Char
+totalFleetSize      Number
+contractedSince     Date
+source      Char
+organizationType        Char
+mainPhoneNumber     Char
+mainFaxNumber       Char
+mainEmailAddress        Char
+homePage        Char
+salesRep        Char
+address     Char
+number      Char
+complement      Char
+county      Char
+city        Char
+state       Char
+postalCode      Char
+description     Char
+        
+        
+        

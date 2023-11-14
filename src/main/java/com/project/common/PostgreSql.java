@@ -80,15 +80,11 @@ public class PostgreSql {
 //            }
 //        }
 //    }
-    
-    /**
-     * 
-     */
-    public static Connection Connection(String dbName,String serverType) {
-        String urlName = "globals."+serverType+".database."+dbName+".url";
-        
-        return Connection(urlName);
-    }
+     public static Connection Connection(String dbName,String serverType) {
+    	 String urlName = "globals."+serverType+".database."+dbName+".url";
+         return Connection(urlName);
+     }
+    		 
     public static Connection Connection(String urlName) {
          Logger logger = Logger.getLogger(PostgreSql.class.getName());
          Connection conn = null;
@@ -120,6 +116,43 @@ public class PostgreSql {
           
          return conn;
     }
+    
+    public static Connection Connection(String dbName,String serverType,boolean isLog,String userInfo) {
+        String urlName = "globals."+serverType+".database."+dbName+".url";
+        Logger logger = Logger.getLogger(PostgreSql.class.getName());
+        Connection conn = null;
+        
+        if(userInfo == null || "".equals(userInfo)) {
+        	userInfo  = "database";
+        }
+        
+         try {
+             if(GlobalProperties.getProperties(urlName) != null && !"".equals(GlobalProperties.getProperties(urlName))) {
+                 String url      = GlobalProperties.getProperties(urlName);
+                 String user     = GlobalProperties.getProperties("globals."+userInfo+".username");
+                 String password = GlobalProperties.getProperties("globals."+userInfo+".password");
+                 conn = DriverManager.getConnection(url, user, password);
+                 if(conn != null) {
+                     StringBuilder log = new StringBuilder();
+                     
+                     if(isLog) log.append("\r\n▶접속 URL   : "+url);
+                     if(isLog) log.append("\r\n▶접속 아이디   : "+user);
+                     if(isLog) log.append("\r\n▶접속 페스워드 : "+password);
+                     
+                     if(isLog) logger.info((new Date())+" : "+log.toString());
+                 }
+             }else {
+            	 if(isLog) logger.info((new Date())+" : globlas.properties 확인 필요..");
+             }
+         } catch (SQLException ex) {
+             logger.log(Level.SEVERE, ex.getMessage(), ex);
+         } 
+//         finally {
+//             try {if (conn != null) {conn.close();}} catch (SQLException ex) {Logger lgr = Logger.getLogger(PostgreSql.class.getName());lgr.log(Level.WARNING, ex.getMessage(), ex);}
+//         }
+         
+        return conn;
+   }
     
     /**
      * 

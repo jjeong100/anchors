@@ -465,6 +465,50 @@ public static List<String> getFileReadListComent(String path) {
 //        }
     }
     
+    /**
+     * 
+     * @param writefullPath
+     * @param content
+     * @param isLog
+     * @return
+     */
+    public static boolean writeFile(String writefullPath,StringBuilder content, boolean isLog) {
+    	return writeFile(writefullPath, content.toString(),  isLog);
+    }
+    
+    /**
+     * 
+     * @param writefullPath
+     * @param content
+     * @param isLog
+     * @return
+     */
+    public static boolean writeFile(String writefullPath,String content, boolean isLog) {
+        File file = new File(writefullPath);
+        
+        boolean result = false;
+        try {
+            if(file.exists()){
+                if(isLog) System.err.println("[writeFile] 파일이 존재하지 않습니다. (기존 삭제후 생성합니다.): "+writefullPath);
+            }else {
+            	if(isLog) System.err.println("[writeFile] 파일이 존재하지 않습니다. (생성 합니다.): "+writefullPath);
+            }
+            if(content != null && !"".equals(content)) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                writer.write(content);
+                writer.close();
+                
+                //파일 쓰기 성공
+                result = true;
+            }
+           
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return result;
+    }
+    
 //    /**
 //     outputs: Camel_Case_To_Something_Else_
 //     desired output: Camel_Case_To_Something_Else

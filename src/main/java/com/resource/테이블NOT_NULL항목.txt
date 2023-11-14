@@ -1,0 +1,54 @@
+replica.synergy_action_audit__c	id	integer
+
+replica.account	id	integer
+
+replica._hcmeta	id	integer
+
+replica._sf_event_log	id	integer
+
+replica.cx_sr_mntsrvc_x__c	id	integer
+
+replica.colorinformation__c	id	integer
+
+
+replica.asset_bulk	id	integer
+
+replica.bluelink__c	id	integer
+
+replica.opportunity	id	integer
+
+replica.case	id	integer
+
+replica._trigger_log	id	integer
+
+replica._trigger_log_archive	id	integer
+
+replica.recordtype	id	integer
+
+replica.product2	id	integer
+
+replica.task	id	integer
+
+replica.account_bulk	id	integer
+
+replica.loyaltyprogram__c	id	integer
+
+replica.rental__c	id	integer
+
+replica.lead	id	integer
+
+replica.dealerservice__c	id	integer
+
+replica.invoiceinfo__c	id	integer
+
+replica.roadsideassistance__c	id	integer
+
+replica.roadsideassistanceservice__c	id	integer
+
+replica.dealerholiday__c	id	integer
+
+replica.loyaltyprogram_bulk	id	integer
+
+replica.account_bulk2	id	integer
+
+replica.asset	id	integer
