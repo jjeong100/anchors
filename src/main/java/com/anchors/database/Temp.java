@@ -3,6 +3,10 @@ package com.anchors.database;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ObjectUtils;
+
+
+
 public class Temp {
     public String rootPath = "D:\\project\\anchors\\src\\main\\java\\com\\resource\\";
     
@@ -18,22 +22,38 @@ public class Temp {
     }
     
     public void Process() {
-    	System.out.println("Temp ....");
-    	
-    	String str = " response = ObjectUtils.isNotEmpty(resultDto) ? defaultMapper.map(resultDto, IFHMBSAPEAICDPP0003Payload.Response.class) : null; ";
-    	
-    	 Pattern pattern = Pattern.compile(".*Payload.*");
-    	  Matcher matcher = pattern.matcher(str);
-    	  if(matcher.find()){    // 정규식과 매칭되는 값이 있으면
-//    	      return matcher.group(2).trim();        // 특정 단어 사이의 값을 추출한다
-    		  System.out.println(matcher.group(0).trim());
-    	  }
-//    	  return null;
-    	  
-    	  String temp = "D:\\workspace\\cdpp-app\\src\\main\\java\\com\\hyundaimotors\\hmb\\cdppapp\\controller\\foundation";
-    	  String repl = "resources\\com\\hyundaimotors\\hmb\\cdppapp\\mapper";
-    	  
-    			  
-    			  
+    	test1();
     }
+    public void test1() {
+//    	String str = " response = ObjectUtils.isNotEmpty(resultDto) ? defaultMapper.map(resultDto, IFHMBSAPEAICDPP0003Payload.Response.class) : null; ";
+    	String str = " process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN},#{PARAM_ID,jdbcType=VARCHAR,mode=IN}); ";
+    	
+    	   
+//    	String str = "|마이크로소프트||애플||페이스북||네이버|";
+    	Pattern pattern = Pattern.compile("[#{](.*)[}]");
+
+    	Matcher matcher = pattern.matcher(str);
+
+    	while (matcher.find()) {
+//    	    System.out.println(matcher.group(0));
+    	    String m = matcher.group(0);
+    	    String[] split = m.split("\\}\\,\\#\\{");
+    	    for(String fstr : split)
+    	    System.out.println(fstr.split("\\,")[0].replace("#{","").replace("}","").toLowerCase());
+
+//    	    if (matcher.group(1) == null) break;
+    	}
+    }
+    
+    public void test2() {
+    	String str = " process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}); ";
+    	
+    	Pattern pattern = Pattern.compile("(\\b#{\\b)(.*?)(\\b}\\b)");
+    	Matcher matcher = pattern.matcher(str);
+    	if(matcher.find()){    // 정규식과 매칭되는 값이 있으면
+    	    System.out.println(matcher.group(2).trim());        // 특정 단어 사이의 값을 추출한다
+    	}
+    }
+    
+   
 }

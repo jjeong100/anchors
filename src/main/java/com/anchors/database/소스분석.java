@@ -6,13 +6,17 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import com.project.common.CommUtil;
+import com.project.common.PostgreSql;
 
 public class 소스분석 {
     public final String resourceRoot = "D:\\project\\anchors\\src\\main\\java\\com\\resource\\";
@@ -30,20 +34,32 @@ public class 소스분석 {
     public Map<String,String> dto     = new HashMap<String,String>();
     public Map<String,String> payload = new HashMap<String,String>();
     
+    public Map<String,String> procedure = new HashMap<String,String>();
+    
     public String mpperRootPath = "";
     
     public static void main(String[] args) {
         final String className = new Object(){}.getClass().getEnclosingClass().getName();
         System.out.println("------------------------------ "+className+" ------------------- St.");
-       
+        String serviceName = "local";//
+        String serverType  = "local";
+        
+//        String serviceName = "dev_prod";//
+//        String serverType  = "dev";
+        
+//        String serviceName = "prod_prod";//
+//        String serverType  = "server";
+        
+        Connection conn = PostgreSql.Connection(serviceName, serverType,false,serviceName);
+        
         try {
             소스분석 process = new 소스분석();
-            process.Process();
+            process.Process(conn);
 //            
         }catch(Exception e) {
             e.printStackTrace();
         }finally {
-//             try{if(conn != null) {conn.close();}}catch(Exception e) {e.printStackTrace();} 
+             try{if(conn != null) {conn.close();}}catch(Exception e) {e.printStackTrace();} 
         }
         System.out.println("------------------------------ "+className+" ------------------- Ed.");
     }
@@ -55,8 +71,8 @@ public class 소스분석 {
 //        str.append(c);
 //    }
     public 소스분석() {
-    	
-    	try (Stream<Path> paths = Files.walk(Paths.get(sourceFolderPath))) {
+        
+        try (Stream<Path> paths = Files.walk(Paths.get(sourceFolderPath))) {
             paths
             .filter(Files::isRegularFile)
             .forEach(a -> {
@@ -74,7 +90,7 @@ public class 소스분석 {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    	
+        
          try (Stream<Path> paths = Files.walk(Paths.get(sourceFolderPath))) {
              paths
              .filter(Files::isRegularFile)
@@ -107,7 +123,7 @@ public class 소스분석 {
                                         while(iter.hasNext()) {
                                             String key = iter.next();
                                             if(sLine.indexOf(key) != -1) {
-                                            	System.out.println(mpperRootPath+key.replace("Dto", "").replace("Payload", "")+"Mapper.xml("+controllerInterface.get(file.getPath())+")");
+                                                System.out.println(mpperRootPath+key.replace("Dto", "").replace("Payload", "")+"Mapper.xml("+controllerInterface.get(file.getPath())+")");
                                                 mapperInterface.put(mpperRootPath+key.replace("Dto", "").replace("Payload", "")+"Mapper.xml",controllerInterface.get(file.getPath()));
                                             }
                                         }
@@ -129,7 +145,7 @@ public class 소스분석 {
      /**
      * 
      */
-    public void Process() {
+    public void Process(Connection conn) {
        StringBuilder controller = new StringBuilder();
        StringBuilder impl       = new StringBuilder();
        StringBuilder xml        = new StringBuilder();
@@ -219,15 +235,55 @@ public class 소스분석 {
 //                               String IF_ID = "";
                                /** procedure **/
                                if(sLine.toLowerCase().indexOf("call ") != -1) {
-                            	  
+                                  
                                    if(sLine.toLowerCase().indexOf("process.") != -1 || sLine.toLowerCase().indexOf("\"process\".") != -1) {
-                                	   System.out.println("["+mapperInterface.get(file.getPath())+"]("+file.getPath()+") : "+sLine);
-                                       String result = sLine.trim().split("\\s")[1];
+                                       System.out.println("["+mapperInterface.get(file.getPath())+"]("+file.getPath()+") : "+sLine);
+//                                       String result = sLine.trim().split("\\s")[1];
+                                       String result = sLine.replace("call", "").replace("CALL", "").trim();
                                        transferProcess.put(mapperInterface.get(file.getPath()), result);
+                                       
+                                       //////////////////////////////////////////////////////////////////////////////////////////////////////// procedure pattern
+                                       StringBuilder param = new StringBuilder();
+                                       param.append("{");
+                                       Pattern pattern = Pattern.compile("[#{](.*)[}]");
+                                          Matcher matcher = pattern.matcher(result);
+                                           while (matcher.find()) {
+    //                                        System.out.println(matcher.group(0));
+                                            String m = matcher.group(0);
+                                            String[] split = m.split("\\}\\,\\#\\{");
+                                            for(int i=0;i<split.length;i++) {
+                                                if(i!=0) param.append(",");
+//                                                System.out.println(split[i].split("\\,")[0].replace("#{","").replace("}","").toLowerCase());
+                                                param.append(split[i].split("\\,")[0].replace("#{","").replace("}","").toLowerCase());
+                                            }
+                                        }
+                                           param.append("}");
+                                       procedure.put(result.trim().replace(";", ""), param.toString());
+                                       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                    }
                                    if(sLine.toLowerCase().indexOf("replica.") != -1 || sLine.toLowerCase().indexOf("\"replica\".") != -1) {
-                                       String result = sLine.trim().split("\\s")[1];
+//                                       String result = sLine.trim().split("\\s")[1];
+                                	   String result = sLine.replace("call", "").replace("CALL", "").trim();
                                        transferReplica.put(mapperInterface.get(file.getPath()), result);
+                                       
+                                       //////////////////////////////////////////////////////////////////////////////////////////////////////// procedure pattern
+                                       StringBuilder param = new StringBuilder();
+                                       param.append("{");
+                                       Pattern pattern = Pattern.compile("[#{](.*)[}]");
+                                       Matcher matcher = pattern.matcher(result);
+                                           while (matcher.find()) {
+    //                                        System.out.println(matcher.group(0));
+                                            String m = matcher.group(0);
+                                            String[] split = m.split("\\}\\,\\#\\{");
+                                            for(int i=0;i<split.length;i++) {
+                                                if(i!=0) param.append(",");
+//                                                System.out.println(split[i].split("\\,")[0].replace("#{","").replace("}","").toLowerCase());
+                                                param.append(split[i].split("\\,")[0].replace("#{","").replace("}","").toLowerCase());
+                                            }
+                                       }
+                                       param.append("}");
+                                       procedure.put(result.trim().replace(";", ""), param.toString());
+                                       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                    }
                                }
                            }
@@ -248,6 +304,12 @@ public class 소스분석 {
        System.out.println("■ IF005 mapper xml          : "+interfaceMapper.get("IF005"));
        System.out.println("■ IF005 transferProcess     : "+transferProcess.get("IF005"));
        System.out.println("■ IF005 transferReplica     : "+transferReplica.get("IF005"));
+       
+       System.out.println("■ IF005 procedure     : "+procedure.get(transferReplica.get("IF005")));
+       String procName = transferReplica.get("IF005").split("\\(")[0];
+       System.out.println(procName);
+       프로시져점검 proc = new 프로시져점검();
+       proc.Process(conn, procName, procedure.get(transferReplica.get("IF005")));
        
 //       CommUtil.getFileReadListComent(sourceFolderPath)
        //컨트롤 위치
