@@ -45,3 +45,5 @@ D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IF
 D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSELFBICDPP0063Mapper.xml
 D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSMARTERSCDPP0036Mapper.xml
 D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBZICARDCDPP0007Mapper.xml
+D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\Test.xml
+D:\workspace\cdpp-app\src\main\resources\logback.xml

@@ -1,0 +1,721 @@
+■ IF003 definition : foundation
+■ IF003 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0002Controller.java
+■ IF003 interfaceMapping    : /api/v1/HMBInboundContactInterfaceWorkflow
+■ IF003 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0002Mapper.xml
+■ IF003 transferProcess     : process.if_in_contact_inf_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN}, #{CONTACT_ID,jdbcType=VARCHAR,mode=IN})
+■ IF003 transferReplica     : Replica.if_in_contact_inf_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN}, #{CONTACT_ID,jdbcType=VARCHAR,mode=IN})
+■ IF003 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0002Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0002Mapper">
+    
+    <select id="foundContactIdbyCpf" parameterType="IFHMBINNOCEANCDPP0002Dto" resultType="String">
+        select 
+            row_id as foundContactIdByCpf
+        from
+            process.account
+        where 
+            cpf__c = #{cpf}
+        limit 1
+    </select>
+    <select id="foundContactId" parameterType="IFHMBINNOCEANCDPP0002Dto" resultType="String">
+        select 
+            row_id as foundContactId
+        from
+            process.account
+        where 
+            firstname = #{firstName}
+        and
+            lastname = #{lastName}
+        and
+            personemail = #{emailAddress}
+        order by
+            row_id desc
+        limit 1
+    </select>
+    <insert id="insertObject" parameterType="IFHMBINNOCEANCDPP0002Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_in_contact_inf_wf
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , integrationid
+            , cpf
+            , firstname
+            , lastname
+            , birthdate            
+            , gender   
+            , source
+            , homephone
+            , workphone
+            , cellphone
+            , emailaddress
+            , wayofcontact
+            , occupation            
+            , maritalstatus
+            , income
+            , carofinterest
+            , calledby
+            , literacy
+            , behavioralsegment            
+            , valuesegment            
+            , googlesegment
+            , facebooksegment
+            , lifecyclesegment            
+            , interestsegment            
+            , contactoptin
+            , streetaddress
+            , streetaddress2
+            , streetaddress3
+            , country
+            , city
+            , state
+            , postalcode
+            , suppressallcalls
+            , suppressallmailings
+            , suppressallemails
+            , suppressallsms
+            , suppressallvideocall
+            , suppressallwhatsapp
+            , suppressallmobile
+            , printedcard
+            , already_customer    
+            , favorite_dealer                   
+        )values(
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{integrationId}
+            , #{cpf}
+            , #{firstName}
+            , #{lastName}
+            , to_date(#{birthDate},'YYYY-MM-DD')
+            , #{gender}
+            , #{source}
+            , #{homePhone}
+            , #{workPhone}
+            , #{cellPhone}
+            , #{emailAddress}
+            , #{wayOfContact}
+            , #{occupation}
+            , #{maritalStatus}
+            , #{income}
+            , #{carOfInterest}
+            , #{calledBy}
+            , #{literacy}
+            , #{behavioralSegment}
+            , #{valueSegment}
+            , #{googleSegment}
+            , #{facebookSegment}
+            , #{lifeCycleSegment}
+            , #{interestSegment}
+            , #{contactOptIn}
+            , #{streetAddress}
+            , #{streetAddress2}
+            , #{streetAddress3}
+            , #{county}
+            , #{city}
+            , #{state}
+            , #{postalCode}
+            , #{suppressAllCalls}
+            , #{suppressAllMailings}
+            , #{suppressAllEmails}
+            , #{suppressAllSMS}
+            , #{suppressAllVideoCall}
+            , #{suppressAllWhatsapp}
+            , #{suppressAllMobile}
+            , #{printedCard}
+            , #{alreadyCustomer}
+            , #{favorite_dealer}
+        )
+    </insert>
+    <insert id="insertCar" parameterType="IFHMBINNOCEANCDPP0002Dto">
+        insert into landing.if_in_contact_inf_wf_car 
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , name
+            , yearmodel
+            , intentiontochange
+            , iscurrent
+            , carmodel
+            , mileage
+            , clientexpectedvalue
+        ) VALUES 
+        <foreach collection="ListOfCurrentCars" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'      
+                , #{item.name}
+                , #{item.yearModel}
+                , #{item.intentionToChange}
+                , #{item.isCurrent}
+                , #{item.carModel}
+                , #{item.mileage}
+                , #{item.clientExpectedValue}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertApp" parameterType="IFHMBINNOCEANCDPP0002Dto">
+        insert into landing.if_in_contact_inf_wf_app 
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , name
+            , startdate            
+            , status   
+        ) VALUES 
+        <foreach collection="ListOfApps" item="item" separator=",">
+        (
+            #{rowId}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'      
+            , #{item.name}
+            , to_date(#{item.startDate}, 'YYYY-MM-DD')
+            , #{item.status}
+        )
+        </foreach>
+    </insert>
+    
+    <insert id="insertSocialmedia" parameterType="IFHMBINNOCEANCDPP0002Dto">
+        insert into landing.if_in_contact_inf_wf_socialmedia 
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by     
+            , name
+            , "user"
+            , joindate
+            , likehmb                 
+        ) VALUES 
+        <foreach collection="ListOfSocialMedia" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'      
+                , #{item.name}
+                , #{item.user}
+                , to_date(#{item.joinDate}, 'YYYY-MM-DD')
+                , case when lower(#{item.likeHMB}) = 'false' then 'N' else 'Y' end 
+            )
+        </foreach>
+    </insert>
+            
+    <insert id="insertHobby" parameterType="IFHMBINNOCEANCDPP0002Dto">
+        insert into landing.if_in_contact_inf_wf_hobby 
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by   
+            , description   
+        ) VALUES 
+        <foreach collection="ListOfHobby" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'      
+                , #{item.description}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertSoccerteam" parameterType="IFHMBINNOCEANCDPP0002Dto">
+        insert into landing.if_in_contact_inf_wf_soccerteam 
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , name      
+        ) VALUES 
+        <foreach collection="ListOfSoccerTeam" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'      
+                , #{item.name}
+            )
+        </foreach>
+    </insert>
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_in_contact_inf_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN}, #{CONTACT_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call Replica.if_in_contact_inf_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN}, #{CONTACT_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>    
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+    declare account_rowid varchar;
+
+    begin            
+
+        
+        
+        if checkcu = 'insert' then
+            -- insert account
+            with personaccount as (
+                insert into process.account 
+                (
+                    cpf__c 
+                    , integrationid
+                    , firstname
+                    , lastname 
+                    , personemail 
+                    , personhomephone 
+                    , personmobilephone 
+                    , personbirthdate     
+                    , income__c 
+                    , productofinterest__c 
+                    , calledby__c 
+                    , literacy__c                    
+                    , preferredcontactchannel__c 
+                    , blockedwhatsapp__c 
+                    , blockedmobile__c 
+                    , x_printed_card__c 
+                    , dealercode__c  
+                    , registrysource__c
+                    , facebook__c
+                    , receiveproductnewsflag__c 
+                    , receiveretailoffersflag__c 
+                    , receiveserviceoffersflag__c 
+                    , receivenewsletterflag__c 
+                    , receiveeventsflag__c 
+                    , receiveresearchflag__c 
+                    , inter_flag 
+                )
+                select
+                    iciw.cpf 
+                    , iciw.integrationid 
+                    , iciw.firstname 
+                    , iciw.lastname 
+                    , iciw.emailaddress 
+                    , iciw.homephone 
+                    , iciw.cellphone 
+                    , iciw.birthdate 
+                    , iciw.income 
+                    , iciw.carofinterest 
+                    , iciw.calledby 
+                    , iciw.literacy 
+                    , iciw.wayofcontact             
+                    , case when iciw.suppressallwhatsapp = 'Y' then true when iciw.suppressallwhatsapp = 'N' then false else null end
+                    , case when iciw.suppressallmobile = 'Y' then true when iciw.suppressallmobile = 'N' then false else null end
+                    , case when iciw.suppressallvideocall = 'Y' then true when iciw.suppressallvideocall = 'N' then false else null end
+                    , iciw.favorite_dealer 
+                    , iciw."source" 
+                    , iciw.facebooksegment 
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                    , 'if_in'
+                from
+                    landing.if_in_contact_inf_wf iciw         
+                where
+                    iciw.row_id = CAST(param_id as INTEGER)
+                returning row_id
+            )    -- insert contact
+            insert into process.contact 
+            (
+                account_row_id
+                , integrationid
+                , cpf__c
+                , firstname
+                , lastname
+                , email
+                , homephone
+                , companyphone__c
+                , mobilephone
+                , gender__c
+                , birthdate
+                , preferredcontactchannel__c
+                , maritalstatus__c                
+                , calloptyn__c
+                , directmailoptyn__c
+                , emailoptyn__c            
+                , x_printed_card__c
+                , blockedwhatsapp__c
+                , blockedmobile__c     
+                , blockedsms__c  
+                , occupation__c
+                , attrib_36__c
+                , productofinterest__c
+                , literacy__c
+                , x_seg_behavioral__c
+                , x_seg_value__c
+                , x_seg_google__c
+                , x_seg_facebook__c
+                , x_seg_life_cycle__c
+                , x_seg_interest__c
+                , receiveproductnewsflag__c 
+                , receiveretailoffersflag__c 
+                , receiveserviceoffersflag__c 
+                , receivenewsletterflag__c 
+                , receiveeventsflag__c 
+                , receiveresearchflag__c 
+                , x_already_customer__c
+                , mailingstreet
+                , mailingstreet_2__c
+                , mailingstreet_3__c
+                , mailingcountry
+                , mailingcity
+                , mailingstate
+                , mailingpostalcode
+                , calledby__c
+                , favoritedealer__c 
+                , inter_flag 
+            )
+            select
+                pa.row_id
+                , iciw.integrationid 
+                , iciw.cpf 
+                , iciw.firstname 
+                , iciw.lastname 
+                , iciw.emailaddress 
+                , iciw.homephone 
+                , iciw.workphone 
+                , iciw.cellphone 
+                , iciw.gender 
+                , iciw.birthdate 
+                , iciw.wayofcontact 
+                , iciw.maritalstatus 
+                , case when iciw.suppressallcalls ='Y' then true when iciw.suppressallcalls = 'N' then false else null end as SUPPRESS_CALL_FLG
+                , case when iciw.suppressallmailings ='Y' then true when iciw.suppressallmailings = 'N' then false else null end as SUPPRESS_MAIL_FLG
+                , case when iciw.suppressallemails ='Y' then true when iciw.suppressallemails = 'N' then false else null end as SUPPRESS_EMAIL_FLG
+                , case when iciw.suppressallvideocall = 'Y' then true when iciw.suppressallvideocall = 'N' then false else null end SUPPRESS_VIDEO_FLG
+                , case when iciw.suppressallwhatsapp  = 'Y' then true when iciw.suppressallwhatsapp = 'N' then false else null end as SUPPRESS_WHATSAPP_FLG
+                , case when iciw.suppressallmobile  = 'Y' then true when iciw.suppressallmobile = 'N' then false else null end as SUPPRESS_MOBILE_FLG
+                , case when iciw.suppressallsms = 'Y' then true when iciw.suppressallsms = 'N' then false else null end as SUPPRESS_SMS_FLG
+                , iciw.occupation 
+                , iciw.income 
+                , iciw.carofinterest 
+                , iciw.literacy 
+                , iciw.behavioralsegment 
+                , iciw.valuesegment 
+                , iciw.googlesegment 
+                , iciw.facebooksegment 
+                , iciw.lifecyclesegment 
+                , iciw.interestsegment                
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , iciw.already_customer 
+                , iciw.streetaddress 
+                , iciw.streetaddress2 
+                , iciw.streetaddress3 
+                , iciw.country 
+                , iciw.city 
+                , iciw.state 
+                , iciw.postalcode 
+                , iciw.calledby         
+                , iciw.favorite_dealer 
+                , 'if_in'
+            from
+                landing.if_in_contact_inf_wf iciw, personaccount pa
+            where
+                iciw.row_id = CAST(param_id as INTEGER);
+            
+        end if;
+    
+        if checkcu = 'update' then
+        
+            -- update account
+            update process.account as pa set 
+--                cpf__c = case when iciw.cpf isnull then pa.cpf__c when iciw.cpf = '' then pa.cpf__c else iciw.cpf end
+                firstname = case when iciw.firstname isnull then pa.firstname when iciw.firstname = '' then pa.firstname else iciw.firstname end
+                , lastname = case when iciw.lastname isnull then pa.lastname when iciw.lastname = '' then pa.lastname else iciw.lastname end  
+                , personemail = case when iciw.emailaddress isnull then pa.personemail when iciw.emailaddress = '' then pa.personemail else iciw.emailaddress end  
+                , personhomephone = case when iciw.homephone isnull then pa.personhomephone when iciw.homephone = '' then pa.personhomephone else iciw.homephone end  
+                , gender__pc = case when iciw.gender isnull then pa.gender__pc when iciw.gender = '' then pa.gender__pc else iciw.gender end 
+                , personmobilephone = case when iciw.cellphone isnull then pa.personmobilephone when iciw.cellphone = '' then pa.personmobilephone else iciw.cellphone end                 
+                , personbirthdate = case when iciw.birthdate isnull then pa.personbirthdate else iciw.birthdate end  
+                , income__c = case when iciw.income isnull then pa.income__c when iciw.income = '' then pa.income__c else iciw.income end  
+                , productofinterest__c = case when iciw.carofinterest isnull then pa.productofinterest__c when iciw.carofinterest = '' then pa.productofinterest__c else iciw.carofinterest end  
+                , calledby__c = case when iciw.calledby isnull then pa.calledby__c when iciw.calledby = '' then pa.calledby__c else iciw.calledby end 
+                , literacy__c = case when iciw.literacy isnull then pa.literacy__c when iciw.literacy = '' then pa.literacy__c else iciw.literacy end  
+                , preferredcontactchannel__c = case when iciw.wayofcontact isnull then pa.preferredcontactchannel__c when iciw.wayofcontact = '' then pa.preferredcontactchannel__c else iciw.wayofcontact end  
+                , blockedwhatsapp__c = case when iciw.suppressallwhatsapp isnull then pa.blockedwhatsapp__c when iciw.suppressallwhatsapp = '' then pa.blockedwhatsapp__c else case when iciw.suppressallwhatsapp = 'Y' then true when iciw.suppressallwhatsapp = 'N' then false else null end end 
+                , blockedmobile__c = case when iciw.suppressallmobile isnull then pa.blockedmobile__c when iciw.suppressallmobile = '' then pa.blockedmobile__c else case when iciw.suppressallmobile = 'Y' then true when iciw.suppressallmobile = 'N' then false else null end end 
+                , x_printed_card__c = case when iciw.suppressallvideocall isnull then pa.x_printed_card__c when iciw.suppressallvideocall = '' then pa.x_printed_card__c else case when iciw.suppressallvideocall = 'Y' then true when iciw.suppressallvideocall = 'N' then false else null end end
+                , dealercode__c = case when iciw.favorite_dealer isnull then pa.dealercode__c when iciw.favorite_dealer = '' then pa.favoritedealer__c else iciw.favorite_dealer end
+                , registrysource__c = case when iciw."source" isnull then pa.registrysource__c when iciw."source" = '' then pa.registrysource__c else iciw."source" end
+                , facebook__c = case when iciw.facebooksegment isnull then pa.facebook__c when iciw.facebooksegment = '' then pa.facebook__c else iciw.facebooksegment end
+                , receiveproductnewsflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveretailoffersflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveserviceoffersflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receivenewsletterflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveeventsflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveresearchflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , inter_flag = 'if_up'
+            from 
+                landing.if_in_contact_inf_wf iciw 
+            where 
+                pa.row_id = contact_id
+            and 
+                iciw.row_id = CAST(param_id as INTEGER);
+    
+            
+            
+            -- update contact
+            update process.contact as pc set 
+--                cpf__c = case when iciw.cpf isnull then pc.cpf__c when iciw.cpf = '' then pc.cpf__c else iciw.cpf end
+                firstname = case when iciw.firstname isnull then pc.firstname when iciw.firstname = '' then pc.firstname else iciw.firstname end
+                , lastname = case when iciw.lastname isnull then pc.lastname when iciw.lastname = '' then pc.lastname else iciw.lastname end  
+                , email = case when iciw.emailaddress isnull then pc.email when iciw.emailaddress = '' then pc.email else iciw.emailaddress end 
+                , homephone = case when iciw.homephone isnull then pc.homephone when iciw.homephone = '' then pc.homephone else iciw.homephone end
+                , companyphone__c = case when iciw.workphone isnull then pc.companyphone__c when iciw.workphone = '' then pc.companyphone__c else iciw.workphone end
+                , mobilephone = case when iciw.cellphone isnull then pc.mobilephone when iciw.cellphone = '' then pc.mobilephone else iciw.cellphone end
+                , gender__c = case when iciw.gender isnull then pc.gender__c when iciw.gender = '' then pc.gender__c else iciw.gender end
+                , birthdate = case when iciw.birthdate isnull then pc.birthdate else iciw.birthdate end 
+                , preferredcontactchannel__c = case when iciw.wayofcontact isnull then pc.preferredcontactchannel__c when iciw.wayofcontact = '' then pc.preferredcontactchannel__c else iciw.wayofcontact end 
+                , maritalstatus__c = case when iciw.maritalstatus isnull then pc.maritalstatus__c when iciw.maritalstatus = '' then pc.maritalstatus__c else iciw.maritalstatus end
+                , calloptyn__c = case when iciw.suppressallcalls isnull then pc.calloptyn__c when iciw.suppressallcalls = '' then pc.calloptyn__c else case when iciw.suppressallcalls = 'Y' then true when iciw.suppressallcalls ='N' then false else null end end 
+                , directmailoptyn__c = case when iciw.suppressallmailings  isnull then pc.directmailoptyn__c when iciw.suppressallmailings = '' then pc.directmailoptyn__c else case when iciw.suppressallmailings  = 'Y' then true when iciw.suppressallmailings  ='N' then false else null end end
+                , emailoptyn__c = case when iciw.suppressallemails  isnull then pc.emailoptyn__c when iciw.suppressallemails = '' then pc.emailoptyn__c else case when iciw.suppressallemails  = 'Y' then true when iciw.suppressallemails  ='N' then false else null end end          
+                , x_printed_card__c = case when iciw.suppressallvideocall isnull then pc.x_printed_card__c when iciw.suppressallvideocall = '' then pc.x_printed_card__c else case when iciw.suppressallvideocall = 'Y' then true when iciw.suppressallvideocall = 'N' then false else null end end 
+                , blockedwhatsapp__c = case when iciw.suppressallwhatsapp isnull then pc.blockedwhatsapp__c when iciw.suppressallwhatsapp = '' then pc.blockedwhatsapp__c else case when iciw.suppressallwhatsapp  = 'Y' then true when iciw.suppressallwhatsapp = 'N' then false else null end end
+                , blockedmobile__c = case when iciw.suppressallmobile isnull then pc.blockedmobile__c when iciw.suppressallmobile = '' then pc.blockedmobile__c else case when iciw.suppressallmobile  = 'Y' then true when iciw.suppressallmobile = 'N' then false else null end end 
+                , blockedsms__c = case when iciw.suppressallsms isnull then pc.blockedsms__c when iciw.suppressallsms = '' then pc.blockedsms__c else case when iciw.suppressallsms = 'Y' then true when iciw.suppressallsms = 'N' then false else null end end
+                , occupation__c = case when iciw.occupation isnull then pc.occupation__c when iciw.occupation = '' then pc.occupation__c else iciw.occupation end
+                , attrib_36__c = case when iciw.income isnull then pc.attrib_36__c when iciw.income = '' then pc.attrib_36__c else iciw.income end
+                , productofinterest__c = case when iciw.carofinterest isnull then pc.productofinterest__c when iciw.carofinterest = '' then pc.productofinterest__c else iciw.carofinterest end
+                , literacy__c = case when iciw.literacy isnull then pc.literacy__c when iciw.literacy = '' then pc.literacy__c else iciw.literacy end
+                , x_seg_behavioral__c = case when iciw.behavioralsegment isnull then pc.x_seg_behavioral__c when iciw.behavioralsegment = '' then pc.x_seg_behavioral__c else iciw.behavioralsegment end
+                , x_seg_value__c = case when iciw.valuesegment isnull then pc.x_seg_value__c when iciw.valuesegment = '' then pc.x_seg_value__c else iciw.valuesegment end
+                , x_seg_google__c = case when iciw.googlesegment isnull then pc.x_seg_google__c when iciw.googlesegment = '' then pc.x_seg_google__c else iciw.googlesegment end
+                , x_seg_facebook__c = case when iciw.facebooksegment isnull then pc.x_seg_facebook__c when iciw.facebooksegment = '' then pc.x_seg_facebook__c else iciw.facebooksegment end 
+                , x_seg_life_cycle__c = case when iciw.lifecyclesegment isnull then pc.x_seg_life_cycle__c when iciw.lifecyclesegment = '' then pc.x_seg_life_cycle__c else iciw.lifecyclesegment end
+                , x_seg_interest__c = case when iciw.interestsegment isnull then pc.x_seg_interest__c when iciw.interestsegment = '' then pc.x_seg_interest__c else iciw.interestsegment end
+                , x_loyalty_optin_flg__c = case when iciw.contactoptin isnull then pc.x_loyalty_optin_flg__c when iciw.contactoptin = '' then pc.x_loyalty_optin_flg__c else iciw.contactoptin end     
+                , x_already_customer__c = case when iciw.already_customer isnull then pc.x_already_customer__c when iciw.already_customer = '' then pc.x_already_customer__c else iciw.already_customer end
+                , mailingstreet = case when iciw.streetaddress isnull then pc.mailingstreet when iciw.streetaddress = '' then pc.mailingstreet else iciw.streetaddress end
+                , mailingstreet_2__c = case when iciw.streetaddress2 isnull then pc.mailingstreet_2__c when iciw.streetaddress2 = '' then pc.mailingstreet_2__c else iciw.streetaddress2 end
+                , mailingstreet_3__c = case when iciw.streetaddress3 isnull then pc.mailingstreet_3__c when iciw.streetaddress3 = '' then pc.mailingstreet_3__c else iciw.streetaddress3 end
+                , mailingcounty  = case when iciw.country isnull then pc.mailingcounty when iciw.country = '' then pc.mailingcounty else iciw.country end
+                , mailingcity = case when iciw.city isnull then pc.mailingcity when iciw.city = '' then pc.mailingcity else iciw.city end
+                , mailingstate = case when iciw.state isnull then pc.mailingstate when iciw.state = '' then pc.mailingstate else iciw.state end
+                , mailingpostalcode = case when iciw.postalcode isnull then pc.mailingpostalcode when iciw.postalcode = '' then pc.mailingpostalcode else iciw.postalcode end
+                , calledby__c = case when iciw.calledby isnull then pc.calledby__c when iciw.calledby = '' then pc.calledby__c else iciw.calledby end 
+                , favoritedealer__c = case when iciw.favorite_dealer isnull then pc.favoritedealer__c when iciw.favorite_dealer = '' then pc.favoritedealer__c else iciw.favorite_dealer end
+                , receiveproductnewsflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveretailoffersflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveserviceoffersflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receivenewsletterflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveeventsflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , receiveresearchflag__c = case when iciw.contactoptin = 'Y' then true when iciw.contactoptin = 'N' then false else null end
+                , inter_flag = 'if_up'
+            from 
+                landing.if_in_contact_inf_wf iciw 
+            where
+                pc.account_row_id  = contact_id    
+            and
+                iciw.row_id  = CAST(param_id as INTEGER);
+        end if;
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+
+    begin    
+    
+
+    
+    if checkcu = 'insert' then
+        -- insert account
+        insert into "replica".account 
+        (
+            external_id__c 
+            , cpf__c 
+            , cpf__pc 
+            , integratedid__c  
+            , firstname         
+            , lastname 
+            , personemail  
+            , personhomephone  
+            , personmobilephone             
+            , personbirthdate     
+            , income__c 
+            , productofinterest__c 
+            , calledby__c 
+            , literacy__c 
+            , preferredcontactchannel__c                             
+            , companyphone__pc 
+            , gender__pc 
+            , maritalstatus__pc             
+            , calloptyn__pc 
+            , directmailoptyn__pc 
+            , emailoptyn__pc 
+            , smsoptyn__pc 
+            , blockedwhatsapp__pc     
+            , blockedvideocall__pc 
+            , blockedmobile__pc 
+            , occupation__pc                 
+            , personmailingstreet 
+            , personmailingcountry 
+            , personmailingcity 
+            , personmailingstate 
+            , personmailingpostalcode     
+            , dealercode__c
+--            , alreadycustomer__c
+            , receiveproductnewsflag__pc
+            , receiveretailoffersflag__pc
+            , receiveserviceoffersflag__pc
+            , receivenewsletterflag__pc
+            , receiveeventsflag__pc
+            , receiveresearchflag__pc
+            , countrycode__c
+            , subsidiarycode__c
+            , subsidiarycode__pc
+            , recordtypeid
+        )
+        select
+            pa.row_id 
+            , pa.cpf__c 
+            , pa.cpf__c 
+            , pa.integrationid
+            , pa.firstname
+            , pa.lastname 
+            , pa.personemail 
+            , pa.personhomephone 
+            , pa.personmobilephone
+            , pa.personbirthdate   
+            , pa.income__c
+            , pa.productofinterest__c 
+            , pa.calledby__c 
+            , pa.literacy__c 
+            , pa.preferredcontactchannel__c 
+            , pc.companyphone__c
+            , pa.gender__pc
+            , pc.maritalstatus__c             
+            , pc.calloptyn__c
+            , pc.directmailoptyn__c
+            , pc.emailoptyn__c 
+            , pc.blockedsms__c            
+            , pc.blockedwhatsapp__c 
+            , pc.x_printed_card__c
+            , pc.blockedmobile__c
+            , pc.occupation__c                
+            , concat( pc.mailingstreet,pc.mailingstreet_2__c,pc.mailingstreet_3__c)          
+            , pc.mailingcountry
+            , pc.mailingcity
+            , pc.mailingstate
+            , pc.mailingpostalcode
+            , pa.dealercode__c
+--            , pc.x_already_customer__c
+            , pc.receiveproductnewsflag__c
+            , pc.receiveretailoffersflag__c
+            , pc.receiveserviceoffersflag__c
+            , pc.receivenewsletterflag__c
+            , pc.receiveeventsflag__c
+            , pc.receiveresearchflag__c
+            , 'BR'
+            , 'HMB'
+            , 'HMB'
+            , (select sfid from "replica".recordtype where  sobjecttype = 'Account' and ispersontype = true and developername = 'HMB_Person_Account')
+        from
+            process.account pa    
+        join 
+            process.contact pc
+        on
+            pa.row_id = pc.account_row_id  
+        where
+            pa.row_id = contact_id;
+            
+    end if;
+    
+    if checkcu = 'update' then
+    
+        -- update account 
+        update "replica".account as ra set                 
+            cpf__c = case when pa.cpf__c isnull then ra.cpf__c else pa.cpf__c end
+--            , cpf__pc = case when pc.cpf__c isnull then ra.cpf__pc else pc.cpf__c end
+            , firstname = case when pa.firstname isnull then ra.firstname else pa.firstname end
+            , lastname = case when pa.lastname isnull then ra.lastname else pa.lastname end
+            , personemail  = case when pa.personemail isnull then ra.personemail else pa.personemail end
+            , personhomephone = case when pa.personhomephone isnull then ra.personhomephone else pa.personhomephone end
+            , personmobilephone = case when pa.personmobilephone isnull then ra.personmobilephone else pa.personmobilephone end            
+            , personbirthdate = case when pa.personbirthdate isnull then ra.personbirthdate else pa.personbirthdate end    
+            , income__c = case when pa.income__c isnull then ra.income__c else pa.income__c end
+            , productofinterest__c = case when pa.productofinterest__c isnull then ra.productofinterest__c else ra.productofinterest__c end
+            , calledby__c = case when pa.calledby__c isnull then ra.calledby__c else pa.calledby__c end
+            , literacy__c = case when pa.literacy__c isnull then ra.literacy__c else pa.literacy__c end
+            , preferredcontactchannel__c = case when pa.preferredcontactchannel__c isnull then ra.preferredcontactchannel__c else pa.preferredcontactchannel__c end
+            , blockedwhatsapp__c = case when pa.x_printed_card__c isnull then ra.blockedwhatsapp__c else pa.x_printed_card__c end
+            , companyphone__pc = case when pc.companyphone__c isnull then ra.companyphone__pc else pc.companyphone__c end 
+            , gender__pc = case when pa.gender__pc  isnull then ra.gender__pc else pa.gender__pc  end 
+            , maritalstatus__pc = case when pc.maritalstatus__c isnull then ra.maritalstatus__pc else pc.maritalstatus__c end 
+            , calloptyn__pc = case when pc.calloptyn__c isnull then ra.calloptyn__pc else pc.calloptyn__c end 
+            , directmailoptyn__pc  = case when pc.directmailoptyn__c isnull then ra.directmailoptyn__pc else pc.directmailoptyn__c end 
+            , emailoptyn__pc  = case when pc.emailoptyn__c isnull then ra.emailoptyn__pc else pc.emailoptyn__c end 
+            , personmailingstreet = case when pc.mailingstreet isnull then ra.personmailingstreet else concat(pc.mailingstreet ,' ',pc.mailingstreet_2__c ,' ', pc.mailingstreet_3__c) end 
+            , neighborhood__c  = case when pc.mailingcounty  isnull then ra.neighborhood__c else pc.mailingcounty  end 
+            , personmailingcity  = case when pc.mailingcity isnull then ra.personmailingcity else pc.mailingcity end 
+            , personmailingstate  = case when pc.mailingstate isnull then ra.personmailingstate else pc.mailingstate end 
+            , personmailingpostalcode  = case when pc.mailingpostalcode isnull then ra.personmailingpostalcode else pc.mailingpostalcode end 
+            , smsoptyn__pc = case when pc.blockedsms__c isnull then ra.smsoptyn__pc else pc.blockedsms__c end 
+            , blockedwhatsapp__pc = case when pc.blockedwhatsapp__c isnull then ra.blockedwhatsapp__pc else pc.blockedwhatsapp__c end 
+            , blockedvideocall__pc = case when pc.x_printed_card__c isnull then ra.blockedvideocall__pc else pc.x_printed_card__c end 
+            , blockedmobile__pc = case when pc.blockedmobile__c isnull then ra.blockedmobile__pc else pc.blockedmobile__c end
+            , dealercode__c = case when pa.dealercode__c isnull then ra.dealercode__c else pa.dealercode__c end
+            , receiveproductnewsflag__pc = case when pa.receiveproductnewsflag__c isnull then ra.receiveproductnewsflag__pc else pa.receiveproductnewsflag__c end 
+            , receiveretailoffersflag__pc = case when pa.receiveretailoffersflag__c isnull then ra.receiveretailoffersflag__pc else pa.receiveretailoffersflag__c end  
+            , receiveserviceoffersflag__pc = case when pa.receiveserviceoffersflag__c isnull then ra.receiveserviceoffersflag__pc else pa.receiveserviceoffersflag__pc end 
+            , receivenewsletterflag__pc = case when pa.receivenewsletterflag__c isnull then ra.receivenewsletterflag__pc else pa.receivenewsletterflag__c end  
+            , receiveeventsflag__pc = case when pa.receiveeventsflag__c isnull then ra.receiveeventsflag__pc else pa.receiveeventsflag__c end  
+            , receiveresearchflag__pc = case when pa.receiveresearchflag__c isnull then ra.receiveresearchflag__pc else pa.receiveresearchflag__c end  
+        from 
+            process.account pa            
+        join
+            process.contact pc
+        on
+            pa.row_id = pc.account_row_id 
+        and 
+            pa.row_id = contact_id    
+        where 
+            ra.external_id__c = contact_id;
+        
+        
+    end if;
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_in_contact_inf_wf_hobby
+landing.if_in_contact_inf_wf
+landing.if_in_contact_inf_wf_car
+landing.if_in_contact_inf_wf_socialmedia
+landing.if_in_contact_inf_wf_app
+landing.if_in_contact_inf_wf_soccerteam
+process.contact
+process.account
+"replica".recordtype
+"replica".account

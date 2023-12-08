@@ -1,0 +1,377 @@
+■ IF029 definition : proactive
+■ IF029 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\proactive\IFHMBINNOCEANCDPP0025Controller.java
+■ IF029 interfaceMapping    : /api/v1/HMBMNTSRVCScheduleMaintenance
+■ IF029 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0025Mapper.xml
+■ IF029 transferProcess     : process.if_mntsrvc_schedule_maintenace(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF029 transferReplica     : replica.if_mntsrvc_schedule_maintenace(#{PROC_PROTOCOL,jdbcType=VARCHAR,mode=IN})
+■ IF029 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0025Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0025Mapper">
+
+    <select id="getProcProtocol" parameterType="ScheduleMaintenanceINDto" resultType="String">
+        select
+            protocol__c as procProtocol
+        from
+            process.service_request
+        where
+            external_id__c = CAST(#{rowId} AS TEXT)
+        limit 1
+    </select>
+
+    <insert id="insertObject" parameterType="ScheduleMaintenanceINDto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_mntsrvc_schedule_maintenance
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , source
+            , srNumber
+            , srReason
+            , srLevel1
+            , srLevel2
+            , srLevel3
+            , srLevel4
+            , srSource
+            , srMethod
+            , srDescription
+            , srPriority
+            , srStatus
+            , dealerCode
+            , chassis
+            , customerCPF
+            , consultantCPF
+            , technicianCPF
+            , serviceType
+            , serviceStatus
+            , serviceArrivaldate
+            , serviceStartdate
+            , serviceDuration
+            , serviceDeliverydate
+        )values(
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{source}
+            , #{srNumber}
+            , #{srReason}
+            , #{srLevel1}
+            , #{srLevel2}
+            , #{srLevel3}
+            , #{srLevel4}
+            , #{srSource}
+            , #{srMethod}
+            , #{srDescription}
+            , #{srPriority}
+            , #{srStatus}
+            , #{dealerCode}
+            , #{chassis}
+            , #{customerCPF}
+            , #{consultantCPF}
+            , #{technicianCPF}
+            , #{serviceType}
+            , #{serviceStatus}
+            , #{serviceArrivaldate}::timestamp
+            , #{serviceStartdate}::timestamp
+            , #{serviceDuration}
+            , #{serviceDeliverydate}::timestamp
+        );
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_mntsrvc_schedule_maintenace(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_mntsrvc_schedule_maintenace(#{PROC_PROTOCOL,jdbcType=VARCHAR,mode=IN});
+    </insert>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare checkrowid int;
+	declare insertsrrowid varchar(22);
+	declare updatesrrowid varchar(22);
+	declare accntrowid varchar;
+	declare contactrowid varchar;
+	declare sr_protocol varchar;
+	begin
+		
+		select process.get_proc_id('service_request'::character varying) into insertsrrowid;
+		
+		select 
+			count(*) into checkrowid
+		from
+			landing.if_mntsrvc_schedule_maintenance lm
+		join
+			process.service_request sr
+		on
+			lm.srnumber = sr.protocol__c
+		where
+			lm.row_id = CAST(param_id AS INTEGER)
+		limit 1;
+		
+		-- select 'account_row_id__c' 
+		select 
+			pa.row_id into accntrowid
+		from
+			process.account pa
+		join
+			landing.if_mntsrvc_schedule_maintenance lm
+		on
+			pa.dealercode__c = lm.dealercode 
+		where
+			lm.row_id = CAST(param_id AS INTEGER)
+		limit 1;
+		
+		-- select 'contact_row_id__c'
+		select 
+			pa.row_id into contactrowid
+		from
+			process.account pa
+		join
+			landing.if_mntsrvc_schedule_maintenance lm
+		on
+			pa.cpf__c  = lm.customercpf  
+		where
+			lm.row_id = CAST(param_id AS INTEGER)
+		limit 1;
+		
+		
+		if 0 = checkrowid then
+			-- insert 'service_request'
+			insert into process.service_request
+				(
+					row_id
+					, protocol__c
+					, reason__c 
+					, voctype__c
+					, voc_class
+					, voc_level_2__c
+					, voc_level_3__c
+					, origin
+					, "method" 
+					, description
+					, priority
+					, status
+					, dealercode__c 
+					, serialnumber 
+					, external_id__c
+					, account_row_id__c 
+					, contact_row_id__c 
+					, inter_flag
+				)
+				select
+					insertsrrowid
+					, process.get_protocol_id('S')
+					, srReason
+					, srLevel1
+					, srLevel2
+					, srLevel3
+					, srLevel4
+					, srSource
+					, srMethod
+					, srDescription
+					, srPriority
+					, srStatus
+					, dealerCode
+					, chassis
+					, imsm.row_id 
+					, accntrowid
+					, contactrowid
+					, 'if_in'
+				from
+					landing.if_mntsrvc_schedule_maintenance imsm
+				where 
+					imsm.row_id = CAST(param_id AS INTEGER); 
+				
+			select 
+				sr.protocol__c into sr_protocol
+			from
+				process.service_request sr 
+			where
+				sr.row_id = insertsrrowid
+			limit 1;
+				
+			-- insert 'dealer_appointment_history'
+			insert into process.dealer_appointment_history
+				(		
+					created
+		            , created_by
+		            , last_upd
+		            , last_upd_by
+		            , par_row_id
+					, srvc_consultant_id
+					, srvc_technician_id
+					, srvc_type
+					, srvc_status_cd
+					, srvc_arrival_date
+					, srvc_start_date
+					, srvc_duration
+					, srvc_delivery_date
+					, protocol__c 	
+					, external_id__c 
+					, inter_flag
+				)
+				select
+					now()
+		            , 'interface'
+		            , now()
+		            , 'interface'
+					, insertsrrowid
+					, consultantCPF
+		            , technicianCPF
+		            , serviceType
+		            , serviceStatus
+		            , serviceArrivaldate
+		            , serviceStartdate
+		            , serviceDuration
+		            , serviceDeliverydate
+		            , sr_protocol
+		            , insertsrrowid
+		            , 'if_in'
+		        from
+		        	landing.if_mntsrvc_schedule_maintenance imsm
+		        where 
+					imsm.row_id = CAST(param_id AS INTEGER); 
+			
+		end if;
+	
+		if 0 < checkrowid then
+		
+			select 
+				sr.row_id into updatesrrowid 
+			from  
+				process.service_request sr 
+			join 
+				landing.if_mntsrvc_schedule_maintenance imsm 
+			on 
+				sr.protocol__c = imsm.srnumber 
+			where 
+				imsm.row_id = CAST(param_id AS INTEGER)
+			limit 1; 
+			
+			-- update 'service_request'
+			update process.service_request as sr set		
+				origin = case when imsm.srsource isnull then sr.origin when imsm.srsource = '' then sr.origin else imsm.srsource end
+				, "method" = case when imsm.srmethod isnull then sr."method" when imsm.srmethod = '' then sr."method" else imsm.srmethod end 
+				, description = case when imsm.srdescription isnull then sr.description when imsm.srdescription = '' then sr.description else imsm.srdescription end 
+				, priority = case when imsm.srpriority isnull then sr.priority when imsm.srpriority = '' then sr.priority else imsm.srpriority end 
+				, status = case when imsm.srstatus isnull then sr.status when imsm.srstatus = '' then sr.status else imsm.srstatus end 
+				, external_id__c = param_id
+				, inter_flag = 'if_up'
+			from 
+				landing.if_mntsrvc_schedule_maintenance as imsm
+			where 
+				sr.protocol__c = imsm.srnumber
+			and 
+				imsm.row_id = CAST(param_id AS INTEGER); 
+			
+			-- update 'dealer_appointment_history'
+			update process.dealer_appointment_history as pd set
+				srvc_type = case when imsm.serviceType isnull then pd.srvc_type when imsm.servicetype = '' then pd.srvc_type else imsm.servicetype end 
+				, srvc_status_cd = case when imsm.serviceStatus isnull then pd.srvc_status_cd when imsm.srstatus = '' then pd.srvc_status_cd else imsm.srstatus end 
+				, srvc_arrival_date = case when imsm.serviceArrivaldate isnull then pd.srvc_arrival_date else imsm.servicearrivaldate end 
+				, srvc_start_date = case when imsm.serviceStartdate isnull then pd.srvc_start_date else imsm.servicestartdate end 
+				, srvc_duration = case when imsm.serviceDuration isnull then pd.srvc_duration else imsm.serviceduration end 
+				, srvc_delivery_date = case when imsm.serviceDeliverydate isnull then pd.srvc_delivery_date else imsm.servicedeliverydate end 
+				, inter_flag = 'if_up'
+			from 
+				landing.if_mntsrvc_schedule_maintenance as imsm
+			where  
+				pd.par_row_id = updatesrrowid
+			and 
+				imsm.row_id = CAST(param_id AS INTEGER); 
+				
+		end if;	
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare checkexternalid varchar;
+	begin
+		
+		select
+			externalid__c into checkexternalid
+		from
+			"replica".dealerappointmenthistory__c rd
+		join
+			process.dealer_appointment_history pd
+		on
+			rd.externalid__c = pd.row_id 
+		where
+			pd.protocol__c = proc_protocol
+		limit 1;
+
+			
+			
+		if checkexternalid isnull then
+			-- insert 'dealerappointmenthistory__c'
+			insert into "replica".dealerappointmenthistory__c
+			(
+				srvcconsultantid__c
+				, srvctechnicianid__c 
+				, srvc_type__c  
+				, srvcstatuscd__c 
+				, srvcarrivaldate__c 
+				, srvcstartdate__c 
+				, srvcduration__c 
+				, srvcdeliverydate__c 
+				, externalid__c 
+				, "name" 
+				, cpf__c 
+				, accountid__r__external_id__c  
+				, dealercode__c 
+			)
+			select
+				srvc_consultant_id
+				, srvc_technician_id
+				, srvc_type
+				, srvc_status_cd
+				, srvc_arrival_date
+				, srvc_start_date
+				, srvc_duration
+				, srvc_delivery_date
+				, pd.row_id  
+				, pd.protocol__c 
+				, (select cpf__c  from process.account a where a.row_id = sr.contact_row_id__c)
+				, sr.account_row_id__c 
+				, sr.dealercode__c 
+			from
+				process.dealer_appointment_history pd
+			join
+				process.service_request sr 
+			on
+				pd.protocol__c = sr.protocol__c 
+			where
+				pd.protocol__c = proc_protocol;
+			
+		else
+			-- update 'dealerappointmenthistory__c'
+			update "replica".dealerappointmenthistory__c as rd set 
+				srvc_type__c = case when pd.srvc_type isnull then rd.srvc_type__c else pd.srvc_type end 
+				, srvcstatuscd__c = case when pd.srvc_status_cd isnull then rd.srvcstatuscd__c else pd.srvc_status_cd end 
+				, srvcarrivaldate__c = case when pd.srvc_arrival_date isnull then rd.srvcarrivaldate__c else pd.srvc_arrival_date end 
+				, srvcstartdate__c = case when pd.srvc_start_date isnull then rd.srvcstartdate__c else pd.srvc_start_date end 
+				, srvcduration__c = case when pd.srvc_duration isnull then rd.srvcduration__c else pd.srvc_duration end 
+				, srvcdeliverydate__c =  case when pd.srvc_delivery_date isnull then rd.srvcdeliverydate__c else pd.srvc_delivery_date end 
+			from 
+				process.dealer_appointment_history pd
+			where 
+				pd.protocol__c = proc_protocol
+			and
+				rd.externalid__c = checkexternalid;
+		end if;
+		
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_mntsrvc_schedule_maintenance
+process.get_protocol_id('s')
+process.account
+process.service_request
+process.get_proc_id('service_request'::character
+process.dealer_appointment_history
+"replica".dealerappointmenthistory__c

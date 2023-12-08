@@ -1,0 +1,612 @@
+■ IF046 definition : foundation
+■ IF046 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0037Controller.java
+■ IF046 interfaceMapping    : /api/v1/HMBUpdateContactINWF
+■ IF046 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0037Mapper.xml
+■ IF046 transferProcess     : process.if_update_contact_in_wf(#{PARAM_ID}, #{VEHICLE_ID}, #{PROC_ACCOUNT_ID})
+■ IF046 transferReplica     : Replica.if_update_contact_in_wf(#{ASSET_ID_LIST}, #{PROC_ACCOUNT_ID})
+■ IF046 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0037Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0037Mapper">
+
+
+    <select id="checkAccountId" parameterType="IFHMBINNOCEANCDPP0037Dto" resultType="int">
+        select 
+	        count(*)
+        from
+            process.account acc        
+        where 
+            acc.row_id = #{contactId}
+    </select>
+
+    <insert id='insertObject' parameterType="IFHMBINNOCEANCDPP0037Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_update_contact_in_wf
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , contactid
+            , cnhexpirationdate
+            , firstname
+            , lastname
+            , birthdate
+            , genre
+            , hkmeretaildate
+            , homephone
+            , workphone
+            , cellularphone
+            , emailaddress
+            , amountfriends
+            , amountchildren
+            , loyaltyoptinflag
+            , streetaddress
+            , addressnumber
+            , addresscomplement
+            , addresscountry
+            , addresscounty
+            , addresscity
+            , addressstate
+            , addresspostalCode
+            , suppressallemails
+            , suppressallmailings
+            , suppressallcalls
+            , suppressallwhatsapp
+            , suppressallmobile
+            , suppressallvideocall
+            , suppressallsms
+            , hmbprintedcard
+        )
+        values
+        (
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{contactId}
+            , nullif(#{cnheXpirationDate},'')::timestamp
+            , #{firstName}
+            , #{lastName}
+            , nullif(#{birthDate},'')::timestamp
+            , #{genre}
+            , nullif(#{hkmeRetailDate},'')::timestamp
+            , #{homePhone}
+            , #{workPhone}
+            , #{cellularPhone}
+            , #{emailAddress}
+            , #{amountFriends}
+            , #{amountChildren}
+            , #{loyaltyOPTINFlag}
+            , #{streetAddress}
+            , #{addressNumber}
+            , #{addressComplement}
+            , #{addressCountry}
+            , #{addressCounty}
+            , #{addressCity}
+            , #{addressState}
+            , #{addressPostalCode}
+            , #{suppressAllEmails}
+            , #{suppressAllMailings}
+            , #{suppressAllCalls}
+            , #{suppressAllWhatsapp}
+            , #{suppressAllMobile}
+            , #{suppressAllVideoCall}
+            , #{suppressAllSMS}
+            , case when lower(#{hmbPrintedCard}) = 'false' then 'N' else 'Y' end
+        )
+    </insert>
+    
+    <insert id="insertAutoVehicle" parameterType="ListOfAutoVehicleDto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_update_contact_in_wf_vehicle
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , par_row_id
+            , vehicleid
+            , relationshipstatus 
+            , hmbrenavamcode
+            , currentmileage
+            , vehiclelicensenumber
+        )
+        values
+            (
+                now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{parRowId}
+                , #{vehicleId}
+                , #{relationshipStatus}
+                , #{hmbRenavamCode}
+                , #{currentMileage}
+                , #{vehicleLicenseNumber}
+            )
+    </insert>
+
+
+    <insert id="insertSocialMedia" parameterType="IFHMBINNOCEANCDPP0037Dto">
+        insert into landing.if_update_contact_in_wf_socialmedia
+        (
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , socialmedianame
+            , socialmediauser
+            , sourcecity
+        )
+        values
+        <foreach collection="listOfContactSocialMedia" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.socialMediaName}
+                , #{item.socialMediaUser}
+                , #{item.sourceCity}
+            )
+        </foreach>
+    </insert> 
+
+
+    <select id="getUpdateContactOutput" parameterType="IFHMBINNOCEANCDPP0037Dto" resultType="com.hyundaimotors.hmb.cdppapp.payload.IFHMBINNOCEANCDPP0037.ContactData">
+        select 
+            pa.row_id as contactId
+            , pa.loyaltyexpirationdate__c  as cnheXpirationDate
+            , pa.firstname as firstName
+            , pa.lastname as lastName
+            , pa.personbirthdate as birthDate
+            , pc.gender__c as gender
+            , pa.hkmeretaildate as retailDate
+            , pa.personhomephone as homePhone
+            , pc.companyphone__c as workPhone
+            , pa.personhomephone as cellPhone
+            , pa.personemail as emailAddress
+            , pc.x_amount_friends__c as amountFriends
+            , pc.x_amount_children__c as amountChildren
+            , pc.x_loyalty_optin_flg__c as loyaltyOPTINFla
+            , pc.mailingstreet as streetAddress
+            , pc.mailingstreet_2__c as streetAddress2
+            , pc.mailingstreet_3__c as streetAddress3
+            , pc.mailingcountry as country
+            , pc.mailingcounty as county
+            , pc.mailingcity as city
+            , pc.mailingstate as state
+            , pc.mailingpostalcode as postalCode
+            , pc.emailoptyn__c as suppressAllEmails
+            , pc.directmailoptyn__c as suppressAllMailings
+            , pc.calloptyn__c as suppressAllCalls
+            , pc.blockedwhatsapp__c as suppressAllWhatsapp
+            , pc.blockedmobile__c as suppressAllMobile
+            , pc.x_printed_card__c as suppressAllVideoCall
+            , pc.blockedsms__c  as suppressAllSMS
+            , pc.x_printed_card__c as hmbPrintedCard
+        from
+            process.account pa
+        join
+            process.contact pc
+        on
+            pa.row_id = pc.account_row_id 
+        where 
+            pa.row_id = #{contactId}
+    </select>
+    
+    <select id="getListVehicle" parameterType="hashMap" resultType="com.hyundaimotors.hmb.cdppapp.payload.IFHMBINNOCEANCDPP0037.ListOfAutoVehicle">
+        select 
+            vehicleid as vehicleId
+            , relationshipstatus as relationshipStatus
+            , hmbrenavamcode as hmbRenavamCode
+            , currentmileage as currentMileage
+            , vehiclelicensenumber as vehicleLicenseNumber
+        from 
+            landing.if_update_contact_in_wf_vehicle v 
+        where 
+            v.row_id in
+            <foreach collection="VEHICLE_ID" item="item" index="idx" open="(" close=")" separator=",">
+                cast(#{item} as Integer)
+            </foreach>     
+    </select>
+
+
+    <select id="getListSocialMedia" parameterType="IFHMBINNOCEANCDPP0037Dto" resultType="com.hyundaimotors.hmb.cdppapp.payload.IFHMBINNOCEANCDPP0037.ListOfContactSocialMedia">
+        select 
+            socialmedianame as socialMediaName
+            , socialmediauser as socialMediaUser
+            , sourcecity as sourceCity
+        from 
+            landing.if_update_contact_in_wf_socialmedia s 
+        where 
+            s.par_row_id = #{rowId}
+    </select>
+
+
+    
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_update_contact_in_wf(#{PARAM_ID}, #{VEHICLE_ID}, #{PROC_ACCOUNT_ID});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call Replica.if_update_contact_in_wf(#{ASSET_ID_LIST}, #{PROC_ACCOUNT_ID});
+    </insert>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+    declare 
+        v_len integer;
+        v_i integer;
+        v_count integer;
+        relation varchar;
+    begin
+        v_len := array_length(vehicle_id, 1);
+    
+        -- update account
+        update process.account as pa set
+            loyaltyexpirationdate__c = case when la.cnhexpirationdate isnull then pa.loyaltyexpirationdate__c else la.cnhexpirationdate end
+            , firstname = case when la.firstname isnull then pa.firstname when la.firstname = '' then pa.firstname else la.firstname end 
+            , lastname = case when la.lastname isnull then pa.lastname when la.lastname = '' then pa.lastname else la.lastname end 
+            , personbirthdate = case when la.birthdate isnull then pa.personbirthdate else la.birthdate end 
+            , gender__pc = case when la.genre isnull then pa.gender__pc when la.genre = '' then pa.gender__pc else la.genre end 
+            , hkmeretaildate = case when la.hkmeretaildate isnull then pa.hkmeretaildate else la.hkmeretaildate end 
+            , personhomephone = case when la.homephone isnull then pa.personhomephone when la.homephone = '' then pa.personhomephone else la.homephone end 
+            , companyphone__pc = case when la.workphone isnull then pa.companyphone__pc when la.workphone = '' then pa.companyphone__pc else la.workphone end 
+            , personmobilephone = case when la.cellularphone isnull then pa.personmobilephone when la.cellularphone = '' then pa.personmobilephone else la.cellularphone end 
+            , personemail = case when la.emailaddress isnull then pa.personemail when la.emailaddress = '' then pa.personemail else la.emailaddress end 
+            , optinflag__c = case when la.loyaltyoptinflag isnull then pa.optinflag__c else case when la.loyaltyoptinflag = 'Y' then true when la.loyaltyoptinflag = 'N' then false else null end end 
+            , billingstreet = case when la.streetaddress  isnull then pa.billingstreet when la.streetaddress = '' then pa.billingstreet else la.streetaddress end 
+            , billingstreet_2__c = case when la.addressnumber  isnull then pa.billingstreet_2__c when la.addressnumber = '' then pa.billingstreet_2__c else la.addressnumber end 
+            , billingstreet_3__c = case when la.addresscomplement isnull then pa.billingstreet_3__c when la.addresscomplement = '' then pa.billingstreet_3__c else la.addresscomplement end 
+            , billingcountry = case when la.addresscountry isnull then pa.billingcountry when la.addresscountry = '' then pa.billingcountry else la.addresscountry end
+            , billingcounty = case when la.addresscounty isnull then pa.billingcounty when la.addresscounty = '' then pa.billingcounty else la.addresscounty end 
+            , billingcity = case when la.addresscity isnull then pa.billingcity when la.addresscity = '' then pa.billingcity else la.addresscity end 
+            , billingstate = case when la.addressstate isnull then pa.billingstate when la.addressstate = '' then pa.billingstate else la.addressstate end 
+            , billingpostalcode = case when la.addresspostalcode isnull then pa.billingpostalcode when la.addresspostalcode = '' then pa.billingpostalcode else la.addresspostalcode end 
+            , emailoptyn__pc = case when la.suppressallemails isnull then pa.emailoptyn__pc else case when la.suppressallemails= 'Y' then true when la.suppressallemails = 'N' then false else null end end
+            , directmailoptyn__pc = case when la.suppressallmailings isnull then pa.directmailoptyn__pc else case when la.suppressallmailings = 'Y' then true when la.suppressallmailings = 'N' then false else null end end 
+            , calloptyn__pc = case when la.suppressallcalls isnull then pa.calloptyn__pc else case when la.suppressallcalls = 'Y' then true when la.suppressallcalls = 'N' then false else null end end 
+            , blockedwhatsapp__c = case when la.hmbprintedcard  isnull then pa.blockedwhatsapp__c else case when la.hmbprintedcard = 'Y' then true when la.hmbprintedcard = 'N' then false else null end end
+            , blockedmobile__c = case when la.suppressallmobile isnull then pa.blockedmobile__c else case when la.suppressallmobile = 'Y' then true when la.suppressallmobile = 'N' then false else null end end 
+            , blockedsms__c = case when la.suppressallsms isnull then pa.blockedsms__c else case when la.suppressallsms = 'Y' then true when la.suppressallsms = 'N' then false else null end end
+            , inter_flag = 'if_up'
+        from
+            landing.if_update_contact_in_wf la
+        where
+            pa.row_id =  proc_account_id[1]
+        and
+            la.row_id = cast(param_id[1] as INTEGER);
+    
+        -- update contact
+        update process.contact as pc set
+            loyaltyexpirationdate__c = case when lc.cnhexpirationdate isnull then pc.loyaltyexpirationdate__c else lc.cnhexpirationdate end 
+            , firstname = case when lc.firstname isnull then pc.firstname when lc.firstname = '' then pc.firstname else lc.firstname end 
+            , lastname = case when lc.lastname isnull then pc.lastname when lc.lastname = '' then pc.lastname else lc.lastname end 
+            , birthdate = case when lc.birthdate isnull then pc.birthdate else lc.birthdate end 
+            , gender__c = case when lc.genre isnull then pc.gender__c when lc.genre = '' then pc.gender__c else lc.genre end 
+            , homephone = case when lc.homephone isnull then pc.homephone when lc.homephone = '' then pc.homephone else lc.homephone end 
+            , companyphone__c = case when lc.workphone isnull then pc.companyphone__c when lc.workphone = '' then pc.companyphone__c else lc.workphone end 
+            , mobilephone = case when lc.cellularphone isnull then pc.mobilephone when lc.cellularphone = '' then pc.mobilephone else lc.cellularphone end 
+            , email = case when lc.emailaddress isnull then pc.email when lc.emailaddress = '' then pc.email else lc.emailaddress end 
+            , x_amount_friends__c = case when lc.amountfriends isnull then pc.x_amount_friends__c else lc.amountfriends::float8 end 
+            , x_amount_children__c = case when lc.amountchildren isnull then pc.x_amount_children__c else lc.amountchildren::float8 end 
+            , x_loyalty_optin_flg__c = case when lc.loyaltyoptinflag isnull then pc.x_loyalty_optin_flg__c when lc.loyaltyoptinflag = '' then pc.x_loyalty_optin_flg__c else lc.loyaltyoptinflag end 
+            , mailingstreet = case when lc.streetaddress isnull then pc.mailingstreet when lc.streetaddress = '' then pc.mailingstreet else lc.streetaddress end 
+            , mailingstreet_2__c = case when lc.addressnumber isnull then pc.mailingstreet_2__c when lc.addressnumber = '' then pc.mailingstreet_2__c else lc.addressnumber end 
+            , mailingstreet_3__c = case when lc.addresscomplement isnull then pc.mailingstreet_3__c when lc.addresscomplement = '' then pc.mailingstreet_3__c else lc.addresscomplement end 
+            , mailingcountry = case when lc.addresscountry isnull then pc.mailingcountry when lc.addresscountry = '' then pc.mailingcountry else lc.addresscountry end 
+            , mailingcounty = case when lc.addresscounty isnull then pc.mailingcounty when lc.addresscounty = '' then pc.mailingcounty else lc.addresscounty end 
+            , mailingcity = case when lc.addresscity isnull then pc.mailingcity when lc.addresscity = '' then pc.mailingcity else lc.addresscity end 
+            , mailingstate = case when lc.addressstate isnull then pc.mailingstate when lc.addressstate = '' then pc.mailingstate else lc.addressstate end 
+            , mailingpostalcode = case when lc.addresspostalcode isnull then pc.mailingpostalcode when lc.addresspostalcode = '' then pc.mailingpostalcode else lc.addresspostalcode end 
+            , emailoptyn__c = case when lc.suppressallemails isnull then pc.emailoptyn__c else case when lc.suppressallemails= 'Y' then true when lc.suppressallemails= 'N' then false else null end end
+            , directmailoptyn__c = case when lc.suppressallmailings isnull then pc.directmailoptyn__c else case when lc.suppressallemails = 'Y' then true when lc.suppressallmailings = 'N' then false else null end end 
+            , calloptyn__c = case when lc.suppressallcalls isnull then pc.calloptyn__c else case when lc.suppressallcalls = 'Y' then true when lc.suppressallcalls = 'N' then false else null end end 
+            , blockedwhatsapp__c = case when lc.suppressallwhatsapp isnull then pc.blockedwhatsapp__c else case when lc.suppressallwhatsapp = 'Y' then true when lc.suppressallwhatsapp = 'N' then false else null end end 
+            , blockedmobile__c = case when lc.suppressallmobile isnull then pc.blockedmobile__c else case when lc.suppressallmobile = 'Y' then true when lc.suppressallmobile = 'N' then false else null end end 
+            , x_printed_card__c = case when lc.hmbprintedcard isnull then pc.x_printed_card__c else case when lc.hmbprintedcard= 'Y' then true when lc.hmbprintedcard= 'N' then false else null end end
+            , blockedsms__c = case when lc.suppressallsms isnull then pc.blockedsms__c else case when lc.suppressallsms = 'Y' then true when lc.suppressallsms = 'N' then false else null end end
+            , inter_flag = 'if_up'
+        from
+            landing.if_update_contact_in_wf lc
+        where
+            pc.account_row_id = proc_account_id[1]
+        and
+            lc.row_id = cast(param_id[1] as INTEGER);
+        
+        if v_len > 0 then 
+	        for v_i in 1..v_len
+	            loop
+	                
+	                select 
+	                    count(*)  into v_count
+	                from
+	                    process.customer_vehicle pcv
+	                join
+	                    landing.if_update_contact_in_wf_vehicle v               
+	                on
+	                    pcv.asset_id = v.vehicleid 
+	                where
+	                    pcv.account_id = proc_account_id[1]
+	                and
+	                    v.row_id = cast(vehicle_id[v_i] as Integer);             
+	                
+	                
+	                
+	                if v_count = 0 then
+	                    -- customer_vehicle insert 
+	                    insert into process.customer_vehicle
+	                    (
+	                        relation_type_cd
+	                        , asset_id 
+	                        , account_id 
+	                        , retail_date
+	                        , inter_flag
+	                    )
+	                    select
+	                        v.relationshipstatus  
+	                        , v.vehicleid
+	                        , proc_account_id[1]
+	                        , l.hkmeretaildate
+	                        , 'if_in'
+	                    from
+	                        landing.if_update_contact_in_wf_vehicle v 
+	                    join
+	                    	landing.if_update_contact_in_wf l 
+	                    on
+	                    	l.row_id = v.par_row_id
+	                    where
+	                        v.row_id = cast(nullif(vehicle_id[v_i],'') as Integer);
+	                
+	                else
+	                    -- customer_vehicle update 
+	                    update process.customer_vehicle as pcv set
+	                        relation_type_cd = case when v.relationshipstatus isnull then pcv.relation_type_cd when v.relationshipstatus = '' then pcv.relation_type_cd else v.relationshipstatus end
+	                        , retail_date = case when l.hkmeretaildate isnull then pcv.retail_date else l.hkmeretaildate end 
+	                        , inter_flag = 'if_up'
+	                    from
+	                        landing.if_update_contact_in_wf_vehicle v
+	                    join
+	                    	landing.if_update_contact_in_wf l 
+	                    on
+	                    	l.row_id = v.par_row_id                    	
+	                    where
+	                        pcv.asset_id = v.vehicleid
+	                    and
+	                        v.row_id = cast(vehicle_id[v_i] as Integer);
+	                end if;
+	            
+	                -- relation 이 owner인 경우 체크 
+	                select 
+	                    lower(v.relationshipstatus) into relation
+	                from
+	                    landing.if_update_contact_in_wf_vehicle v
+	                where                   
+	                    v.row_id = cast(vehicle_id[v_i] as Integer);
+	                
+	            
+	                if relation = 'owner'  then
+	                    -- asset update 
+	                    update process.asset as pass set
+	                        renavam_code__c = case when v.hmbrenavamcode isnull then pass.renavam_code__c else v.hmbrenavamcode end
+	                        , latestmileage__c = case when v.currentmileage isnull then pass.latestmileage__c else v.currentmileage end
+	                        , carregistrationnumber__c = case when v.vehiclelicensenumber isnull then pass.carregistrationnumber__c else v.vehiclelicensenumber end
+	                        , inter_flag = 'if_up'
+	                    from
+	                        landing.if_update_contact_in_wf_vehicle v
+	                    where
+	                        pass.row_id = v.vehicleid
+	                    and
+	                        v.row_id = cast(vehicle_id[v_i] as Integer);
+	                end if;
+	            
+	            
+	            end loop;
+	     	end if;
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare
+		a_len integer;
+		a_i integer;
+		a_count integer;
+		relation varchar;
+	begin		
+		a_len := array_length(asset_id_list, 1);
+		
+		-- update account
+		update "replica".account ra set 
+			loyaltyexpirationdate__c  = case when pa.loyaltyexpirationdate__c  isnull then ra.loyaltyexpirationdate__c else pa.loyaltyexpirationdate__c end 
+			, firstname = case when pa.firstname isnull then ra.firstname else pa.firstname end 
+			, lastname = case when pa.lastname isnull then ra.lastname else pa.lastname end 
+			, personbirthdate = case when pa.personbirthdate isnull then ra.personbirthdate else pa.personbirthdate end 
+			, gender__pc = case when pa.gender__pc isnull then ra.gender__pc else pa.gender__pc end 
+			, personhomephone = case when pa.personhomephone isnull then ra.personhomephone else pa.personhomephone end 
+			, personmobilephone = case when pa.personmobilephone isnull then ra.personmobilephone else pa.personmobilephone end 
+			, personemail = case when pa.personemail isnull then ra.personemail else pa.personemail end 
+--			, amountfriends
+--			, amountchildren
+			, optinflag__c = case when pa.optinflag__c isnull then ra.optinflag__c else pa.optinflag__c end 
+			, personmailingstreet = case when pa.billingstreet isnull then ra.personmailingstreet else concat(pa.billingstreet||' '||pa.billingstreet_2__c||' '||pa.billingstreet_3__c) end
+			, personmailingcountry = case when pa.billingcounty isnull then ra.personmailingcountry else pa.billingcountry end
+--			, personmailingcounty
+			, personmailingcity = case when pa.billingcity isnull then ra.personmailingcity else pa.billingcity end 
+			, personmailingstate = case when pa.billingstate isnull then ra.personmailingstate else pa.billingstate end
+			, personmailingpostalcode = case when pa.billingpostalcode isnull then ra.personmailingpostalcode else pa.billingpostalcode end 
+			, emailoptyn__pc = case when pa.emailoptyn__pc isnull then ra.emailoptyn__pc else pa.emailoptyn__pc end 
+			, directmailoptyn__pc = case when pa.directmailoptyn__pc isnull then ra.directmailoptyn__pc else pa.directmailoptyn__pc end 
+			, calloptyn__pc = case when pa.calloptyn__pc isnull then ra.calloptyn__pc else pa.calloptyn__pc end 
+			, blockedwhatsapp__c = case when pa.x_printed_card__c isnull then ra.blockedwhatsapp__c else pa.x_printed_card__c end 
+			, blockedmobile__pc  = case when pa.blockedmobile__c isnull then ra.blockedmobile__pc else pa.blockedmobile__c end 
+			, blockedsms__c  = case when pa.blockedsms__c isnull then ra.blockedsms__c else pa.blockedsms__c end 
+		from
+			process.account pa
+		where 
+			ra.external_id__c = proc_account_id[1]
+		and 
+			pa.row_id = proc_account_id[1];
+		
+		
+		-- update contact
+		update "replica".contact rc set 
+--			loyaltyexpirationdate__c = case when pc.loyaltyexpirationdate__c isnull then rc.loyaltyexpirationdate__c else pc.loyaltyexpirationdate__c end 
+			firstname = case when pc.firstname isnull then rc.firstname else pc.firstname end 
+			, lastname = case when pc.lastname isnull then rc.lastname else pc.lastname end 
+			, birthdate = case when pc.birthdate isnull then rc.birthdate else pc.birthdate end 
+			, gender__c = case when pc.gender__c isnull then rc.gender__c else pc.gender__c end 
+			, homephone = case when pc.homephone isnull then rc.homephone else pc.homephone end 
+			, companyphone__c = case when pc.companyphone__c isnull then rc.companyphone__c else pc.companyphone__c end 
+			, mobilephone = case when pc.mobilephone isnull then rc.mobilephone else pc.mobilephone end 
+			, email = case when pc.email isnull then rc.email else pc.email end 
+			, mailingstreet = case when pc.mailingstreet isnull then rc.mailingstreet else concat(pc.mailingstreet||' '||pc.mailingstreet_2__c||' '||pc.mailingstreet_3__c) end
+			, mailingcountry = case when pc.mailingcountry isnull then rc.mailingcountry else pc.mailingcountry end 
+--			, mailingcounty
+			, mailingcity = case when pc.mailingcity isnull then rc.mailingcity else pc.mailingcity end 
+			, mailingstate = case when pc.mailingstate isnull then rc.mailingstate else pc.mailingstate end 
+			, mailingpostalcode = case when pc.mailingpostalcode isnull then rc.mailingpostalcode else pc.mailingpostalcode end
+			, emailoptyn__c = case when pc.emailoptyn__c isnull then rc.emailoptyn__c  else pc.emailoptyn__c end 
+			, directmailoptyn__c = case when pc.directmailoptyn__c isnull then rc.directmailoptyn__c else pc.directmailoptyn__c end 
+			, calloptyn__c = case when pc.calloptyn__c isnull then rc.calloptyn__c else pc.calloptyn__c end 
+			, blockedwhatsapp__c  = case when pc.x_printed_card__c isnull then rc.blockedwhatsapp__c  else pc.x_printed_card__c end 
+			, blockedmobile__c = case when pc.blockedmobile__c isnull then rc.blockedmobile__c else pc.blockedmobile__c end 
+			, blockedvideocall__c = case when pc.x_printed_card__c  isnull then rc.blockedvideocall__c else pc.x_printed_card__c end 
+			, blockedsms__c = case when pc.blockedsms__c isnull then rc.blockedsms__c  else pc.blockedsms__c end 
+		from
+			process.contact pc
+		where			
+			rc.external_id__c  = pc.row_id
+		and
+			pc.account_row_id = proc_account_id[1];
+		
+		if a_len > 0 then 
+		
+			for a_i in 1..a_len
+				loop
+					
+					select 
+						count(*) into a_count
+					from
+						"replica".customervehicle__c rcv
+					join
+						process.customer_vehicle pcv 
+					on
+						rcv.external_id__c  = pcv.row_id  
+					where
+						pcv.account_id = proc_account_id[1]
+					and
+						pcv.asset_id = asset_id_list[a_i];
+					
+					
+					
+					
+					if a_count = 0 then
+						-- customervehicle__c insert 
+						insert into "replica".customervehicle__c
+						(
+							relationship__c
+							, external_id__c
+							, account__r__external_id__c 
+							, vehicle__r__external_id__c 
+							, retaildate__c 
+						)
+						select
+							pcv.relation_type_cd 
+							, pcv.row_id 
+							, proc_account_id[1]
+							, asset_id_list[a_i]
+							, pcv.retail_date 
+						from
+							process.customer_vehicle pcv
+						where
+							pcv.asset_id = asset_id_list[a_i];
+						
+						
+						select 
+							lower(cv.relation_type_cd) into relation
+						from
+							process.customer_vehicle cv 
+						where
+							cv.asset_id = asset_id_list[a_i];
+						
+						
+						if relation = 'owner' then
+							-- asset update 
+							update "replica".asset as rass set 
+								carregistrationnumber__c = case when pass.renavam_code__c isnull then rass.carregistrationnumber__c else pass.renavam_code__c end 
+								, latestmileage__c = case when pass.latestmileage__c isnull then rass.latestmileage__c else pass.latestmileage__c end 
+								, version__c = case when pass.carregistrationnumber__c isnull then rass.version__c else pass.carregistrationnumber__c end 
+							from
+								process.asset pass 
+							where 
+								pass.row_id  = asset_id_list[a_i]
+							and 
+								rass.external_id__c = asset_id_list[a_i];
+						end if;
+						
+					else				
+						-- customervehicle__c update 
+						update "replica".customervehicle__c rcv set 
+							relationship__c = case when pcv.relation_type_cd isnull then rcv.relationship__c else pcv.relation_type_cd end
+							, retaildate__c = case when pcv.retail_date isnull then rcv.retaildate__c else pcv.retail_date end 
+						from
+							process.customer_vehicle pcv 
+						where 
+							rcv.external_id__c  = pcv.row_id 
+						and 
+							pcv.asset_id = asset_id_list[a_i];
+						
+						
+						select 
+							lower(cv.relation_type_cd) into relation
+						from
+							process.customer_vehicle cv 
+						where
+							cv.asset_id = asset_id_list[a_i];
+						
+						
+						if relation = 'owner' then
+							-- asset update 
+							update "replica".asset as rass set 
+								carregistrationnumber__c = case when pass.renavam_code__c isnull then rass.carregistrationnumber__c else pass.renavam_code__c end 
+								, latestmileage__c = case when pass.latestmileage__c isnull then rass.latestmileage__c else pass.latestmileage__c end 
+								, version__c = case when pass.carregistrationnumber__c isnull then rass.version__c else pass.carregistrationnumber__c end 
+							from
+								process.asset pass 
+							where 
+								pass.row_id  = asset_id_list[a_i]
+							and 
+								rass.external_id__c = asset_id_list[a_i];
+						end if;
+						
+						
+						
+					end if;
+	
+					
+					
+				end loop;
+			
+			end if;
+		
+			
+			
+
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_update_contact_in_wf_vehicle
+landing.if_update_contact_in_wf_socialmedia
+landing.if_update_contact_in_wf
+process.contact
+process.account
+process.customer_vehicle
+process.asset
+"replica".contact
+"replica".asset
+"replica".account
+"replica".customervehicle__c

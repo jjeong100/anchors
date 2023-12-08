@@ -1,0 +1,294 @@
+■ IF005 definition : foundation
+■ IF005 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBSAPEAICDPP0003Controller.java
+■ IF005 interfaceMapping    : /api/v1/HMBProductInboundWF
+■ IF005 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0003Mapper.xml
+■ IF005 transferProcess     : process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF005 transferReplica     : replica.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{PRODUCT_ID,jdbcType=VARCHAR,mode=IN})
+■ IF005 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0003Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSAPEAICDPP0003Mapper">
+    
+    <insert id="insertObject" parameterType="IFHMBSAPEAICDPP0003Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_product_in_wf
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , name
+            , source
+            , type
+            , part
+            , advdesc
+            , modelyear
+            , chassimodel
+            , bodystyle
+            , hmbcylindercapacity
+            , engine
+            , enginedesc
+            , versiondesc
+            , transmissiondesc
+            , transmission
+            , fuel
+            , doorsamnt
+            , suggestedprice    
+            , description
+            , producttypecode        
+        )
+        values
+        (
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{name}
+            , #{source}
+            , #{type}
+            , #{part}
+            , #{advdesc}
+            , #{modelYear}
+            , #{chassiModel}
+            , #{bodyStyle}
+            , #{hmbCylindercapacity}
+            , #{engine}
+            , #{engineDesc}
+            , #{versionDesc}
+            , #{transmissionDesc}
+            , #{transmission}
+            , #{fuel}
+            , #{doorsAmnt}
+            , #{suggestedPrice}::float8          
+            , #{description}
+            , #{productTypeCode}
+        )
+        ;
+    </insert>    
+
+    <select id="getProductRowId" parameterType="IFHMBSAPEAICDPP0003Dto" resultType="String">
+        select 
+            row_id as processProductId
+        from 
+            process.product
+        where
+            "name" = #{name} 
+    </select>
+
+    
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{PRODUCT_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+</mapper>
+
+
+				
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+    declare product_rowid varchar(15);
+    declare product_num int;
+
+    begin
+        --product_rowid := concat('PRD'::text || lpad(nextval('process.seq_product'::regclass)::text, 11, '0'::text))::character varying;
+        -- Product Name 확인 
+        select
+            count(*) into product_num
+        from 
+            landing.if_product_in_wf ipiw 
+        join
+            process.product p 
+        on
+            ipiw."name" = p."name" 
+        where 
+            ipiw.row_id = CAST(param_id as INTEGER);
+        
+        
+        -- insert
+        if product_num = 0 then
+            insert into process.product
+            (
+                "name"
+                , source__c 
+                , product_type__c  
+                , part__c  
+                , advanced_desc__c 
+                , model_year__c 
+                , chassi_model__c 
+                , body_style__c 
+                , sap_cylinder_capacity__c  
+                , engine__c  
+                , engine_desc__c 
+                , version_desc__c  
+                , transmission_desc__c 
+                , transmission__c  
+                , fuel__c 
+                , doors_amount__c 
+                , suggested_price__c  
+                , description 
+                , productcode 
+                , inter_flag
+            )
+            select
+                ipiw."name"
+                , ipiw."source"
+                , ipiw."type"
+                , ipiw.part
+                , ipiw.advdesc
+                , ipiw.modelyear
+                , ipiw.chassimodel 
+                , ipiw.bodystyle
+                , ipiw.hmbcylindercapacity
+                , ipiw.engine
+                , ipiw.enginedesc
+                , ipiw.versiondesc 
+                , ipiw.transmissiondesc 
+                , ipiw.transmission
+                , ipiw.fuel
+                , ipiw.doorsamnt
+                , ipiw.suggestedprice
+                , ipiw.description 
+                , ipiw.producttypecode 
+                , 'if_in'
+            from 
+                landing.if_product_in_wf ipiw 
+            where 
+                ipiw.row_id = CAST(param_id as INTEGER);
+            
+        -- update   
+        else
+            update process.product p set 
+                source__c = case when ipiw."source" isnull then p.source__c else ipiw."source" end 
+                , product_type__c = case when ipiw."type" isnull then p.product_type__c else ipiw."type" end 
+                , sap_description__c = case when ipiw.part isnull then p.sap_description__c else ipiw.part end 
+                , advanced_desc__c = case when ipiw.advdesc isnull then p.advanced_desc__c else ipiw.advdesc end 
+                , model_year__c = case when cast(ipiw.modelyear as float8) isnull then p.model_year__c else cast(ipiw.modelyear as float8) end 
+                , chassi_model__c = case when ipiw.chassimodel isnull then p.chassi_model__c else ipiw.chassimodel end 
+                , body_style__c = case when ipiw.bodystyle isnull then p.body_style__c else ipiw.bodystyle end 
+                , sap_cylinder_capacity__c = case when ipiw.hmbcylindercapacity isnull then p.sap_cylinder_capacity__c else ipiw.hmbcylindercapacity end 
+                , engine__c = case when ipiw.engine isnull then p.engine__c else ipiw.engine end 
+                , engine_desc__c = case when ipiw.enginedesc isnull then p.engine_desc__c else ipiw.enginedesc end 
+                , version_desc__c = case when ipiw.versiondesc isnull then p.version_desc__c else ipiw.versiondesc end 
+                , transmission_desc__c = case when ipiw.transmissiondesc isnull then p.transmission_desc__c else ipiw.transmissiondesc end 
+                , transmission__c = case when ipiw.transmission isnull then p.transmission__c else ipiw.transmission end 
+                , fuel__c = case when ipiw.fuel isnull then p.fuel__c else ipiw.fuel end 
+                , doors_amount__c = case when cast(ipiw.doorsamnt as VARCHAR(30)) isnull then p.doors_amount__c else cast(ipiw.doorsamnt as VARCHAR(30)) end 
+                , suggested_price__c = case when ipiw.suggestedprice isnull then p.suggested_price__c else ipiw.suggestedprice end
+                , description = case when ipiw.description isnull then p.description when ipiw.description = '' then p.description else ipiw.description end 
+                , productcode = case when ipiw.producttypecode isnull then p.productcode when ipiw.producttypecode = '' then p.productcode else ipiw.producttypecode end
+                , inter_flag = 'if_up'
+            from
+                landing.if_product_in_wf ipiw 
+            where 
+                p."name" = ipiw."name"
+            and
+                ipiw.row_id = CAST(param_id as INTEGER);     
+        end if;
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare product_rowid varchar(30);
+	declare product_num int;
+
+	begin	
+
+		
+		-- Product Name 확인 
+		select
+			count(*) into product_num
+		from 
+			process.product pp 
+		join
+			"replica".product2 rp 
+		on
+			pp."name" = rp."name" 
+		where 
+			pp.row_id = product_id;
+		
+		
+		-- insert
+		if product_num = 0 then
+			insert into "replica".product2
+			(
+				"name" 
+				, source_system__c 
+				, product_type__c  
+				, part__c  
+				, advanced_desc__c 
+				, model_year__c 
+				, chassi_model__c 
+				, body_style__c 
+				, hmb_cylinder_capacity__c 
+				, engine__c 
+				, engine_desc__c 
+				, version_desc__c 
+				, transmission_desc__c 
+				, transmission__c 
+				, fuel__c 
+				, doors_amount__c 
+				, suggested_price__c  
+				, description 
+				, productcode 
+				, external_id__c 				
+			)
+			select
+				"name"
+				, source__c 
+				, product_type__c  
+				, part__c  
+				, advanced_desc__c 
+				, model_year__c 
+				, chassi_model__c 
+				, body_style__c 
+				, sap_cylinder_capacity__c  
+				, engine__c  
+				, engine_desc__c 
+				, version_desc__c  
+				, transmission_desc__c 
+				, transmission__c  
+				, fuel__c 
+				, doors_amount__c 
+				, suggested_price__c  
+				, description 
+				, productcode 
+				, row_id 
+			from 
+				process.product p
+			where 
+				p.row_id = product_id;
+			
+		-- update	
+		else
+			update "replica".product2 rp set 
+				source_system__c  = case when pp.source__c isnull then rp.source_system__c  else pp.source__c end 
+				, product_type__c  = case when pp.product_type__c isnull then rp.product_type__c else pp.product_type__c end 
+				, description  = case when pp.sap_description__c isnull then rp.description else pp.sap_description__c end 
+				, advanced_desc__c  = case when pp.advanced_desc__c isnull then rp.advanced_desc__c else pp.advanced_desc__c end 
+				, model_year__c  = case when pp.model_year__c isnull then rp.model_year__c else pp.model_year__c end 
+				, chassi_model__c  = case when pp.chassi_model__c isnull then rp.chassi_model__c else pp.chassi_model__c end 
+				, body_style__c  = case when pp.body_style__c isnull then rp.body_style__c else pp.body_style__c end 
+				, hmb_cylinder_capacity__c  = case when pp.sap_cylinder_capacity__c isnull then rp.hmb_cylinder_capacity__c else pp.sap_cylinder_capacity__c end 
+				, engine__c  = case when pp.engine__c isnull then rp.engine__c else pp.engine__c end 
+				, engine_desc__c  = case when pp.engine_desc__c isnull then rp.engine_desc__c else pp.engine_desc__c end 
+				, version_desc__c  = case when pp.version_desc__c isnull then rp.version_desc__c else pp.version_desc__c end 
+				, transmission_desc__c  = case when pp.transmission_desc__c isnull then rp.transmission_desc__c else pp.transmission_desc__c end 
+				, transmission__c  = case when pp.transmission__c isnull then rp.transmission__c else pp.transmission__c end 
+				, fuel__c  = case when pp.fuel__c isnull then rp.fuel__c else pp.fuel__c end 
+				, doors_amount__c  = case when pp.doors_amount__c isnull then rp.doors_amount__c else pp.doors_amount__c end 			
+				, suggested_price__c = case when pp.suggested_price__c isnull then rp.suggested_price__c else pp.suggested_price__c end
+				--, description = case when pp.description isnull then rp.description else pp.description end 
+				, productcode = case when pp.productcode isnull then rp.productcode else pp.productcode end 
+			from
+				process.product pp 
+			where 
+				rp."name" = pp."name"
+			and
+				pp.row_id = product_id;
+		end if;
+
+	END;
+

@@ -1,0 +1,41 @@
+■ IF001 definition : foundation
+■ IF001 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0001Controller.java
+■ IF001 interfaceMapping    : /api/v1/HMBGetContactWF
+■ IF001 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0001Mapper.xml
+■ IF001 transferProcess     : null
+■ IF001 transferReplica     : null
+■ IF001 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0001Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0001Mapper">
+    
+    <select id="getObject" parameterType="IFHMBINNOCEANCDPP0001Dto" resultType="IFHMBINNOCEANCDPP0001Dto">
+        select 
+            pa.cpf__c as cpf
+            , pa.row_id as contactId
+            , coalesce(pa.firstname, '')||pa.lastname as name
+            , pa.personmobilephone as personCell
+            , sr.protocol__c as protocolNumber
+            , coalesce(pa.firstname, '')||pa.lastname as protocolOwnerName
+            , sr.status as protocolStatus
+        from 
+            process.account pa
+        join
+            process.service_request sr 
+        on
+            pa.row_id = sr.contact_row_id__c
+        where
+            1=1
+        <if test="phoneNumber != null and !phoneNumber.equals('')">
+            and
+                personmobilephone = #{phoneNumber}
+        </if>        
+        <if test="cpf != null and !cpf.equals('')">
+            and
+                cpf__c = #{cpf}
+        </if>
+        order by sr.legacycreateddate__c asc
+        limit 1
+    </select>
+</mapper>

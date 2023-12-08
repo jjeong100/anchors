@@ -1,0 +1,318 @@
+■ IF007 definition : foundation
+■ IF007 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBSAPCDPP0005Controller.java
+■ IF007 interfaceMapping    : /api/v1/HMBAccountWebserviceWF
+■ IF007 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPCDPP0005Mapper.xml
+■ IF007 transferProcess     : process.if_account_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN},#{PROC_ACC_ID,jdbcType=VARCHAR,mode=IN},#{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF007 transferReplica     : replica.if_account_ws_wf(#{PROC_ACC_ID,jdbcType=VARCHAR,mode=IN},#{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF007 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPCDPP0005Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSAPCDPP0005Mapper">
+
+    <select id="foundAccountIdbyCnpj" parameterType="IFHMBSAPCDPP0005Dto" resultType="String">
+        select
+            row_id as foundAccountIdbyCnpj
+        from
+            process.account
+        where
+            corporateregistrationnumber__c = #{cnpjNumber}
+        limit 1
+    </select>
+
+    <select id="foundAccountIdbyNameAndPhoneAndEmail" parameterType="IFHMBSAPCDPP0005Dto" resultType="String">
+        select
+            row_id as foundAccountIdbyCnpj
+        from
+            process.account
+        where  corporateregistrationnumber__c = #{cnpjNumber}
+          or ("name"              = #{name}
+              and phone           = #{mainPhoneNumber}
+              and emailaddress__c = #{mainEmailAddress})
+        limit 1
+    </select>
+
+    <select id="foundAccountId" parameterType="IFHMBSAPCDPP0005Dto" resultType="String">
+        select
+            row_id as foundAccountId
+        from
+            process.account
+        where lower(trim(name)) = lower(trim(#{name}))
+          and phone             = #{mainPhoneNumber}
+          and emailaddress__c   = #{mainEmailAddress}
+        limit 1
+    </select>
+
+    <insert id="insertObject" parameterType="IFHMBSAPCDPP0005Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_account_ws_wf
+            (
+                created
+                , created_by
+                , last_upd
+                , last_upd_by
+                , integrationid
+                , cnpjnumber
+                , name
+                , nickname
+                , parentaccountname
+                , agencycode
+                , fleetacconttype
+                , industrytrend
+                , numberofemployee
+                , totalfleetsize
+                , contractedsince
+                , source
+                , organizationtype
+                , mainphonenumber
+                , mainfaxnumber
+                , mainemailaddress
+                , homepage
+                , streetaddress
+                , streetaddress2
+                , Streetaddress3
+                , country
+                , city
+                , state
+                , postalcode
+                , description
+            )
+        values
+            (
+                now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{integrationId}
+                , #{cnpjNumber}
+                , #{name}
+                , #{nickname}
+                , #{parentAccountName}
+                , #{agencyCode}
+                , #{fleetAccontType}
+                , #{industryTrend}
+                , #{numberOfEmployee}
+                , #{totalFleetSize}
+                , to_date(nullif(#{contractedSince},''), 'YYYY-MM-DD')
+                , #{source}
+                , #{organizationType}
+                , #{mainPhoneNumber}
+                , #{mainFaxNumber}
+                , #{mainEmailAddress}
+                , #{homepage}
+                , #{streetAddress}
+                , #{streetAddress2}
+                , #{streetAddress3}
+                , #{county}
+                , #{city}
+                , #{state}
+                , #{postalCode}
+                , #{description}
+
+            );
+    </insert>
+
+    <insert id="insertProcessAccount" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_account_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN},#{PROC_ACC_ID,jdbcType=VARCHAR,mode=IN},#{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+
+    <insert id="insertReplicaAccount" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_account_ws_wf(#{PROC_ACC_ID,jdbcType=VARCHAR,mode=IN},#{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+    declare account_num int;
+
+    begin
+
+     -- upsert
+         WITH UPSERT AS (
+             update process.account a set
+                corporateregistrationnumber__c   = case when iaww.cnpjnumber isnull then a.corporateregistrationnumber__c when iaww.cnpjnumber = '' then a.corporateregistrationnumber__c else iaww.cnpjnumber end
+                , corporaterepresentativename__c = case when iaww.nickname isnull then a.corporaterepresentativename__c when iaww.nickname = '' then a.corporaterepresentativename__c else iaww.nickname end
+                , ori_cd__c                      = case when iaww.agencycode isnull then a.ori_cd__c when iaww.agencycode = '' then a.ori_cd__c else iaww.agencycode end
+                , fleettype__c                   = case when iaww.fleetacconttype  isnull then a.fleettype__c when iaww.fleetacconttype = '' then a.fleettype__c else iaww.fleetacconttype end
+                , industry                       = case when iaww.industrytrend isnull then a.industry when iaww.industrytrend = '' then a.industry else iaww.industrytrend end
+                , numberofemployees              = case when iaww.numberofemployee isnull then a.numberofemployees when iaww.numberofemployee = '' then a.numberofemployees else iaww.numberofemployee end
+                , x_tot_flt_size__c              = case when cast(iaww.totalfleetsize as varchar(10)) isnull then a.x_tot_flt_size__c else cast(iaww.totalfleetsize as varchar(10)) end
+                , x_contracted_since__c          = case when iaww.contractedsince isnull then a.x_contracted_since__c else iaww.contractedsince end
+                , registrysource__c              = case when iaww."source" isnull then a.registrysource__c when iaww."source" = '' then a.registrysource__c else iaww."source" end
+                , businesstype__c                = case when iaww.organizationtype isnull then a.businesstype__c when iaww.organizationtype = '' then a.businesstype__c else iaww.organizationtype end
+                , phone                          = case when iaww.mainphonenumber isnull then a.phone when iaww.mainphonenumber = '' then a.phone else iaww.mainphonenumber end
+                , fax                            = case when iaww.mainfaxnumber isnull then a.fax when iaww.mainfaxnumber = '' then a.fax else iaww.mainfaxnumber end
+                , emailaddress__c                = case when iaww.mainemailaddress isnull then a.emailaddress__c when iaww.mainemailaddress = '' then a.emailaddress__c else iaww.mainemailaddress end
+                , website                        = case when iaww.homepage isnull then a.website when iaww.homepage = '' then a.website else iaww.homepage end
+                , billingstreet                  = case when iaww.streetaddress isnull then a.billingstreet when iaww.streetaddress = '' then a.billingstreet else iaww.streetaddress end
+                , billingstreet_2__c             = case when iaww.streetaddress2 isnull then a.billingstreet_2__c when iaww.streetaddress2 = '' then a.billingstreet_2__c else iaww.streetaddress2 end
+                , billingstreet_3__c             = case when iaww.streetaddress3 isnull then a.billingstreet_3__c when iaww.streetaddress3 = '' then a.billingstreet_3__c else iaww.streetaddress3 end
+                , billingcountry                 = case when iaww.country isnull then a.billingcountry when iaww.country = '' then a.billingcountry else iaww.country end
+                , billingcity                    = case when iaww.city isnull then a.billingcity when iaww.city = '' then a.billingcity else iaww.city end
+                , billingstate                   = case when iaww.state isnull then a.billingstate when iaww.state = '' then a.billingstate else iaww.state end
+                , billingpostalcode              = case when iaww.postalcode isnull then a.billingpostalcode when iaww.postalcode = '' then a.billingpostalcode else iaww.postalcode end
+                , description                    = case when iaww.description isnull then a.description  when iaww.description = '' then a.description else iaww.description end
+                , inter_flag                     = 'if_up'
+            from landing.if_account_ws_wf iaww
+            where a.row_id = proc_acc_id
+              and iaww.row_id = CAST(nullif(param_id,'') as INTEGER) RETURNING *)
+            insert into process.account
+            (
+                integrationid
+                , corporateregistrationnumber__c
+                , "name"
+                , corporaterepresentativename__c
+                , ori_cd__c
+                , fleettype__c
+                , industry
+                , numberofemployees
+                , x_tot_flt_size__c
+                , x_contracted_since__c
+                , registrysource__c
+                , businesstype__c
+                , phone
+                , fax
+                , emailaddress__c
+                , website
+                , billingstreet
+                , billingstreet_2__c
+                , billingstreet_3__c
+                , billingcountry
+                , billingcity
+                , billingstate
+                , billingpostalcode
+                , description
+                , inter_flag
+            )
+            select
+                iaww.integrationid
+                , iaww.cnpjnumber
+                , iaww."name"
+                , iaww.nickname
+                , iaww.agencycode
+                , iaww.fleetacconttype
+                , iaww.industrytrend
+                , iaww.numberofemployee
+                , cast(iaww.totalfleetsize as varchar(10))
+                , iaww.contractedsince
+                , iaww."source"
+                , iaww.organizationtype
+                , iaww.mainphonenumber
+                , iaww.mainfaxnumber
+                , iaww.mainemailaddress
+                , iaww.homepage
+                , iaww.streetaddress
+                , iaww.streetaddress2
+                , iaww.streetaddress3
+                , iaww.country
+                , iaww.city
+                , iaww.state
+                , iaww.postalcode
+                , iaww.description
+                , 'if_in'
+            from
+                landing.if_account_ws_wf iaww
+            where
+                iaww.row_id = CAST(nullif(param_id,'') as INTEGER)
+                and NOT EXISTS ( SELECT * FROM UPSERT);
+
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+    begin
+        -- upsert
+         WITH UPSERT AS (update "replica".account ra set
+                corporateregistrationnumber__c = case when pa.corporateregistrationnumber__c isnull then ra.corporateregistrationnumber__c else pa.corporateregistrationnumber__c end
+                , "name" = case when pa."name" isnull then ra."name" else pa."name" end
+                , corporaterepresentativename__c = case when pa.corporaterepresentativename__c isnull then ra.corporaterepresentativename__c else pa.corporaterepresentativename__c end
+                , dealergroupcode__c = case when pa.ori_cd__c isnull then ra.dealergroupcode__c else pa.ori_cd__c end
+                , fleettype__c = case when pa.fleettype__c isnull then ra.fleettype__c  else pa.fleettype__c end
+                , industry = case when pa.industry isnull then ra.industry else pa.industry end
+                , numberofemployees = case when cast(nullif(pa.numberofemployees,'') as Integer) isnull then ra.numberofemployees else cast(nullif(pa.numberofemployees,'') as Integer) end
+                , fleetsize__c = case when cast(nullif(pa.x_tot_flt_size__c,'') as float8) isnull then ra.fleetsize__c else cast(nullif(pa.x_tot_flt_size__c,'') as float8) end
+                --, x_contracted_since__c = ?
+                , registrysource__c = case when pa.registrysource__c isnull then ra.registrysource__c else pa.registrysource__c end
+                , businesstype__c = case when pa.businesstype__c isnull then ra.businesstype__c else pa.businesstype__c end
+                , phone = case when pa.phone isnull then ra.phone else pa.phone end
+                , fax = case when pa.fax isnull then ra.fax else pa.fax end
+                , emailaddress__c = case when pa.emailaddress__c isnull then ra.emailaddress__c else pa.emailaddress__c end
+                , website = case when pa.website isnull then ra.website else pa.website end
+                , billingstreet = case when concat(pa.billingstreet || pa.billingstreet_2__c || pa.billingstreet_3__c) isnull then ra.billingstreet else concat(pa.billingstreet || pa.billingstreet_2__c || pa.billingstreet_3__c) end
+                , billingcountry = case when pa.billingcountry isnull then ra.billingcountry else pa.billingcountry end
+                , billingcity = case when pa.billingcity isnull then ra.billingcity else pa.billingcity end
+                , billingstate = case when pa.billingstate isnull then ra.billingstate else pa.billingstate end
+                , billingpostalcode = case when pa.billingpostalcode isnull then ra.billingpostalcode else pa.billingpostalcode end
+                , description = case when pa.description isnull then ra.description else pa.description end
+            from
+                process.account pa
+            where
+                ra.external_id__c = proc_acc_id
+            and
+                pa.row_id = proc_acc_id  RETURNING *)
+            insert into "replica".account
+            (
+                external_id__c
+                , integratedid__c
+                , cnpj__c
+                , "name"
+                , corporaterepresentativename__c
+                , dealergroupcode__c
+                , fleettype__c
+                , industry
+                , numberofemployees
+                , fleetsize__c
+                --, x_contracted_since__c
+                , registrysource__c
+                , businesstype__c
+                , phone
+                , fax
+                , emailaddress__c
+                , website
+                , billingstreet
+                , billingcountry
+                , billingcity
+                , billingstate
+                , billingpostalcode
+                , description
+                , subsidiarycode__c
+                , recordtypeid
+            )
+            select
+                pa.row_id
+                , pa.integrationid
+                , pa.corporateregistrationnumber__c
+                , pa."name"
+                , pa.corporaterepresentativename__c
+                , pa.ori_cd__c
+                , pa.fleettype__c
+                , pa.industry
+                , cast(nullif(pa.numberofemployees,'') as Integer)
+                , cast(nullif(pa.x_tot_flt_size__c,'') as float8)
+                --, pa.x_contracted_since__c
+                , pa.registrysource__c
+                , pa.businesstype__c
+                , pa.phone
+                , pa.fax
+                , pa.emailaddress__c
+                , pa.website
+                , concat(pa.billingstreet || pa.billingstreet_2__c || pa.billingstreet_3__c)
+                , pa.billingcountry
+                , pa.billingcity
+                , pa.billingstate
+                , pa.billingpostalcode
+                , pa.description
+                , 'HMB'
+                , (select sfid from "replica".recordtype where sobjecttype = 'Account' and ispersontype = false and developername = 'HMB_Business_Account')
+            from
+                process.account pa
+            where
+                pa.row_id  = proc_acc_id
+             and NOT EXISTS ( SELECT * FROM UPSERT);
+    END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_account_ws_wf
+process.account
+"replica".recordtype
+"replica".account

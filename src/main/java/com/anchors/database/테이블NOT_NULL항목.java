@@ -17,13 +17,13 @@ public class 테이블NOT_NULL항목 {
 //        String serviceName = "local";//
 //        String serverType  = "local";
         
-//        String serviceName = "dev_prod";//
+//        String serviceName = "prod";//
 //        String serverType  = "dev";
         
-        String serviceName = "prod_prod";//
+        String serviceName = "prod";//
         String serverType  = "server";
         
-        Connection conn = PostgreSql.Connection(serviceName, serverType,false,serviceName);
+        Connection conn = PostgreSql.Connection(serviceName, serverType,true);
                 
         try {
             테이블NOT_NULL항목 process = new 테이블NOT_NULL항목();

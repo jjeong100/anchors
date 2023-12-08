@@ -1,6 +1,5 @@
 package com.project.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
@@ -18,13 +17,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -117,20 +109,27 @@ public class PostgreSql {
          return conn;
     }
     
-    public static Connection Connection(String dbName,String serverType,boolean isLog,String userInfo) {
-        String urlName = "globals."+serverType+".database."+dbName+".url";
+    /**
+     * 
+     * @param serverName
+     * @param serverType
+     * @param isLog
+     * @return
+     */
+    public static Connection Connection(String serverName,String serverType,boolean isLog) {
+        String urlName = "globals."+serverName+"."+serverType+".url";
         Logger logger = Logger.getLogger(PostgreSql.class.getName());
         Connection conn = null;
         
-        if(userInfo == null || "".equals(userInfo)) {
-        	userInfo  = "database";
-        }
-        
          try {
+        	 System.out.println(urlName);
+        	 
              if(GlobalProperties.getProperties(urlName) != null && !"".equals(GlobalProperties.getProperties(urlName))) {
+           
+                 
                  String url      = GlobalProperties.getProperties(urlName);
-                 String user     = GlobalProperties.getProperties("globals."+userInfo+".username");
-                 String password = GlobalProperties.getProperties("globals."+userInfo+".password");
+                 String user     = GlobalProperties.getProperties("globals."+serverName+"."+serverType+".username");
+                 String password = GlobalProperties.getProperties("globals."+serverName+"."+serverType+".password");
                  conn = DriverManager.getConnection(url, user, password);
                  if(conn != null) {
                      StringBuilder log = new StringBuilder();
@@ -697,63 +696,63 @@ public class PostgreSql {
 //        }
 //    }
     
-    public static void xmlRead(String id, List<String> params) {
-    	String[] array = new String[params.size()];
-    	for(int index=0;index<array.length;index++) {
-    		array[index] = new String(params.get(index));
-    	}
-    	
-    	xmlRead(id,array);
-    	
-    }
+//    public static void xmlRead(String id, List<String> params) {
+//    	String[] array = new String[params.size()];
+//    	for(int index=0;index<array.length;index++) {
+//    		array[index] = new String(params.get(index));
+//    	}
+//    	
+//    	xmlRead(id,array);
+//    	
+//    }
     
-    public static void xmlRead(String id, String[] params) {
-        try {
-            // XML 문서 파싱
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-            Document document = documentBuilder.parse(xmlFile);
-            
-            // root 구하기
-            Element root = document.getDocumentElement();
-            
-            // root의 속성
-            System.out.println("class name: " + root.getAttribute("name"));
-            
-            NodeList childeren = root.getChildNodes(); // 자식 노드 목록 get
-            for(int i = 0; i < childeren.getLength(); i++){
-                Node node = childeren.item(i);
-                if(node.getNodeType() == Node.ELEMENT_NODE){ // 해당 노드의 종류 판정(Element일 때)
-                    Element ele = (Element)node;
-                    String nodeName = ele.getNodeName();
-                    
-                    if(id.equals(nodeName)) {
-                    	System.out.println(ele.getAttribute(id));
-                    }
-                    
-                    System.out.println("node name: " + nodeName);
-//                    if(nodeName.equals("teacher")){
-//                        System.out.println("node attribute: " + ele.getAttribute("name"));
+//    public static void xmlRead(String id, String[] params) {
+//        try {
+//            // XML 문서 파싱
+//            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+//            Document document = documentBuilder.parse(xmlFile);
+//            
+//            // root 구하기
+//            Element root = document.getDocumentElement();
+//            
+//            // root의 속성
+//            System.out.println("class name: " + root.getAttribute("name"));
+//            
+//            NodeList childeren = root.getChildNodes(); // 자식 노드 목록 get
+//            for(int i = 0; i < childeren.getLength(); i++){
+//                Node node = childeren.item(i);
+//                if(node.getNodeType() == Node.ELEMENT_NODE){ // 해당 노드의 종류 판정(Element일 때)
+//                    Element ele = (Element)node;
+//                    String nodeName = ele.getNodeName();
+//                    
+//                    if(id.equals(nodeName)) {
+//                    	System.out.println(ele.getAttribute(id));
 //                    }
-//                    else if(nodeName.equals("student")){
-//                        // 이름이 student인 노드는 자식노드가 더 존재함
-//                        NodeList childeren2 = ele.getChildNodes();
-//                        for(int a = 0; a < childeren2.getLength(); a++){
-//                            Node node2 = childeren2.item(a);
-//                            if(node2.getNodeType() == Node.ELEMENT_NODE){
-//                                Element ele2 = (Element)node2;
-//                                String nodeName2 = ele2.getNodeName();
-//                                System.out.println("node name2: " + nodeName2);
-//                                System.out.println("node attribute2: " + ele2.getAttribute("num"));
-//                            }
-//                        }
-//                    }
-                }
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
+//                    
+//                    System.out.println("node name: " + nodeName);
+////                    if(nodeName.equals("teacher")){
+////                        System.out.println("node attribute: " + ele.getAttribute("name"));
+////                    }
+////                    else if(nodeName.equals("student")){
+////                        // 이름이 student인 노드는 자식노드가 더 존재함
+////                        NodeList childeren2 = ele.getChildNodes();
+////                        for(int a = 0; a < childeren2.getLength(); a++){
+////                            Node node2 = childeren2.item(a);
+////                            if(node2.getNodeType() == Node.ELEMENT_NODE){
+////                                Element ele2 = (Element)node2;
+////                                String nodeName2 = ele2.getNodeName();
+////                                System.out.println("node name2: " + nodeName2);
+////                                System.out.println("node attribute2: " + ele2.getAttribute("num"));
+////                            }
+////                        }
+////                    }
+//                }
+//            }
+//        }catch(Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     
     private static SqlMapClient sqlMap;
     

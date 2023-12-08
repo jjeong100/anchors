@@ -1,0 +1,22 @@
+insert into landing.if_product_list_in_wf_product
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , name
+            , source
+            , type
+            , suggestedprice
+            )
+        values
+            (
+                now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{name}
+                , #{source}
+                , #{type}
+                , cast(#{suggestedPrice} as float8)
+            )        

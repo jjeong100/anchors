@@ -1,0 +1,670 @@
+■ IF008 definition : voc
+■ IF008 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\voc\IFHMBSAPEAICDPP0006Controller.java
+■ IF008 interfaceMapping    : /api/v1/HMBActionInboundWebserviceWF
+■ IF008 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0006Mapper.xml
+■ IF008 transferProcess     : process.if_action_in_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF008 transferReplica     : replica.if_action_in_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF008 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0006Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSAPEAICDPP0006Mapper">
+    
+    <insert id="insertAction" parameterType="IFHMBSAPEAICDPP0006Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_action_in_ws_wf(
+            created
+            , created_by
+            , last_upd 
+            , last_upd_by
+            , integrationid
+            , "result"
+            , answer
+            , status
+            , hotlineid
+            , hotlinecreation
+            , pwaid
+            , pwacreation
+            , roid
+            , rocreation
+            , mobisid
+            , mobisstatus
+            , expecteddelivery
+            , purchasepurposeid
+            , "type"
+            , srprotocol
+            , priority
+            , "owner"
+            , description
+            , contactid
+            , dealercode
+            , serialnumber
+            , creationdate
+            , planneddt
+            , ordernum
+            , dpuser
+            , estoque
+        )values(    
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{integrationId}
+            , #{result}
+            , #{answer}
+            , #{status}
+            , #{hotlineId}
+            , #{hotlineCreation}::timestamp
+            , #{pwaId}
+            , #{pwaCreation}
+            , #{roId}
+            , #{roCreation}::timestamp
+            , #{mobisId}
+            , #{mobisStatus}
+            , #{expectedDelivery}::timestamp
+            , #{purchasePurposeId}
+            , #{type}
+            , #{srProtocol}
+            , #{priority}
+            , #{owner}
+            , #{description}
+            , #{contactId}
+            , #{dealerCode}
+            , #{serialNumber}
+            , #{creationDate}::timestamp
+            , #{plannedDt}::timestamp
+            , #{orderNum}
+            , #{dpUser}
+            , #{estoque}
+        )
+    </insert>
+
+    <insert id="insertActionNote" parameterType="IFHMBSAPEAICDPP0006Dto">
+        insert into landing.if_action_in_ws_wf_note(
+            par_row_id 
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , noteType
+            , noteDate
+            , noteDescription
+            , noteCreator
+        ) values (
+            #{rowId}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{actionNote.noteType}
+            , #{actionNote.noteDate}::timestamp
+            , #{actionNote.noteDescription}
+            , #{actionNote.noteCreator}
+        )
+    </insert>
+
+    <insert id="insertActionProducts" parameterType="IFHMBSAPEAICDPP0006Dto">
+        insert into landing.if_action_in_ws_wf_products(
+            par_row_id 
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , partid
+            , partqty
+        ) values (
+            #{rowId}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{actionProducts.partId}
+            , #{actionProducts.partQty}
+        )
+    </insert>
+
+    <insert id="insertSynergyActionAudit" parameterType="IFHMBSAPEAICDPP0006Dto">
+        insert into landing.if_action_in_ws_wf_synergyactionaudit(
+            par_row_id 
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , fieldname
+            , fieldvalue
+        ) values (
+            #{rowId}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{synergyActionAudit.fieldName}
+            , #{synergyActionAudit.fieldValue}
+        )
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_action_in_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_action_in_ws_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <select id="getTaskRowId" parameterType="IFHMBSAPEAICDPP0006Dto" resultType="String">
+        select
+            row_id as actionId
+        from
+            process.task
+        where
+            active_row_id = #{rowId}
+    </select>
+
+    <select id="getActionRowId" parameterType="IFHMBSAPEAICDPP0006Dto" resultType="String">
+        select 
+            row_id as actionRowId
+        from 
+            process.service_event_act
+        where 
+            external_id__c = cast(#{rowId} as TEXT)
+    </select>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare type_td varchar(30);
+	declare protocol_sr varchar(64);
+	declare protocol_num_td int;	
+	declare protocol_num_qh int;
+	declare protocol_num_case int;
+	declare integrationid_num_tk int;
+	declare event_action_ck int;
+
+	begin
+			
+		/*if event_action_ck = 0 then*/
+			insert into process.service_event_act(
+				protocol__c
+				, "type"
+				, priority
+				, planneddt__c
+				, status__c
+				, description
+				, result__c
+				, answer__c
+				, integrationid__c
+				, hotlineid__c
+				, hotlinecreation__c
+				, pwaid__c
+				, pwacreation__c
+				, roid__c
+				, rocreation__c
+				, mobisid__c
+				, mobisstatus__c
+				, expecteddelivery__c
+				, purchasepurposeid__c
+				, created
+				, ordernum__c
+				, legacy_created
+				, legacy_created_by
+				, legacy_last_upd
+				, legacy_last_upd_by
+				, external_id__c
+				, serialnumber
+				, dp_user
+				, contact_row_id__c
+				, stock__c
+				, sra_sr_id
+				, inter_flag
+			)select
+				srprotocol
+				, "type"
+				, priority
+				, planneddt
+				, status
+				, description
+				, "result"
+				, answer
+				, integrationid
+				, hotlineid
+				, hotlinecreation
+				, pwaid
+				, pwacreation
+				, roid
+				, rocreation
+				, mobisid
+				, mobisstatus
+				, expecteddelivery
+				, purchasepurposeid
+				, created
+				, ordernum
+				, created
+				, created_by
+				, last_upd
+				, last_upd_by
+				, row_id
+				, serialnumber
+				, dpuser
+				, contactid
+				, estoque
+				, (select row_id from process.service_request where protocol__c = srprotocol)
+				, 'if_in'
+			from landing.if_action_in_ws_wf aiww
+			where 
+				aiww.row_id = CAST(param_id AS INTEGER);
+		/*else
+			
+		end if;*/
+		select
+			"type", protocol__c  into type_td, protocol_sr
+		from 
+			process.service_event_act
+		where 
+			external_id__c = param_id;
+		
+		-- Test Drive
+		if type_td = 'Test drive - update' then
+			-- Service Request Number 값(testdrivehistory) 확인
+			select
+				count(*) into protocol_num_td
+			from 
+				process.service_event_act psea
+			join 
+				process.testdrivehistory tdh
+			on
+				psea.protocol__c = tdh.protocolid__c
+			where
+				psea.external_id__c = param_id;
+			
+			-- update
+			if protocol_num_td > 0 then
+				update process.testdrivehistory tdh set 
+					status__c = 'Done'
+					, type_cd = case when psea."type" isnull then tdh.type_cd else psea."type" end
+					, active_row_id = psea.row_id
+					, inter_flag = 'if_up'
+				from 
+					process.service_event_act psea
+				where 
+					tdh.protocolid__c = psea.protocol__c
+				and
+					psea.external_id__c = param_id;
+			end if;
+		
+		elseif type_td = 'Test drive - add' then
+			-- Service Request Number 값(testdrivehistory) 확인
+			select
+				count(*) into protocol_num_td
+			from 
+				process.service_event_act psea
+			join 
+				process.testdrivehistory tdh
+			on
+				psea.protocol__c = tdh.protocolid__c
+			where
+				psea.external_id__c = param_id;	
+		
+			if protocol_num_td > 0 then
+				-- update  
+				update process.testdrivehistory tdh set 
+					status__c = case when psea.status__c isnull then tdh.status__c else psea.status__c end
+					, "RequestDescription__c" = case when psea.description isnull then tdh."RequestDescription__c" else psea.description end
+					, type_cd = case when psea."type" isnull then tdh.type_cd else psea."type" end
+					, active_row_id = psea.row_id
+					, inter_flag = 'if_up'
+				from
+					process.service_event_act psea
+				where
+					tdh.protocolid__c = psea.protocol__c
+				and
+					psea.external_id__c = param_id;
+			end if;
+			
+		-- Case 
+		else
+			-- Service Request Number 값(case) 확인
+			select
+				count(*) into protocol_num_case
+			from 
+				process.service_event_act psea
+			join 
+				process."case" cs
+			on
+				psea.protocol__c = cs.protocol__c 
+			where
+				psea.external_id__c = param_id;
+			
+			-- IntegrationId 값(Task) 확인
+			select
+				count(*) into integrationid_num_tk
+			from 
+				process.service_event_act psea
+			join 
+				process.task tk
+			on
+				psea.integrationid__c = tk.integrationid__c
+			where
+				psea.external_id__c = param_id;
+		
+			if protocol_num_case > 0 then
+				if integrationid_num_tk = 0 then
+					-- insert 
+					insert into process.task
+					(
+						protocol__c
+						, "type"
+						, planneddt__c
+						, status
+						, result__c
+						, answer__c
+						, serialnumber__c
+						, dpuser__c
+						, integrationid__c
+						, hotlineid__c
+						, hotlinecreation__c
+						, pwaid__c
+						, pwacreation__c
+						, roid__c
+						, rocreation__c
+						, mobisid__c
+						, mobisstatus__c
+						, expecteddelivery__c
+						, purchasepurposeid__c
+						, contactid
+						, dealercode__c
+						, creationdt__c
+						, ordernum__c
+						, stock__c
+						, priority
+						, description
+						, created
+			            , created_by
+			            , last_upd 
+			            , last_upd_by
+			            , active_row_id
+			            , external_id__c
+			            , inter_flag
+					)
+					select
+						protocol__c
+						, "type"
+						, planneddt__c
+						, status__c
+						, result__c
+						, answer__c
+						, serialnumber
+						, dp_user
+						, integrationid__c
+						, hotlineid__c
+						, hotlinecreation__c
+						, pwaid__c
+						, pwacreation__c
+						, roid__c
+						, rocreation__c
+						, mobisid__c
+						, mobisstatus__c
+						, expecteddelivery__c
+						, purchasepurposeid__c
+						, contact_row_id__c
+						, dealercode__c
+						, created
+						, ordernum__c
+						, stock__c	
+						, priority
+						, description
+						, legacy_created
+						, legacy_created_by
+						, legacy_last_upd
+						, legacy_last_upd_by
+			            , row_id
+			            , param_id
+			            , 'if_in'
+					from 
+						process.service_event_act psea
+					where 
+						psea.external_id__c = param_id;
+				else
+					-- update 
+					update process.task as tk set 
+						"type" = case when psea."type" isnull then tk."type" else psea."type" end
+						, planneddt__c = case when psea.planneddt__c isnull then tk.planneddt__c else psea.planneddt__c end 
+						, status = case when psea.status__c isnull then tk.status else psea.status__c end
+						, result__c = case when psea.result__c isnull then tk.result__c else psea.result__c end
+						, answer__c = case when psea.answer__c isnull then tk.answer__c else psea.answer__c end
+						, serialnumber__c = case when psea.serialnumber isnull then tk.serialnumber__c else psea.serialnumber end
+						, dpuser__c = case when psea.dp_user isnull then tk.dpuser__c else psea.dp_user end
+						, hotlinecreation__c = case when psea.hotlinecreation__c isnull then tk.hotlinecreation__c else psea.hotlinecreation__c end
+						, pwacreation__c = case when psea.pwacreation__c isnull then tk.pwacreation__c else psea.pwacreation__c end
+						, rocreation__c = case when psea.rocreation__c isnull then tk.rocreation__c else psea.rocreation__c end
+						, mobisstatus__c = case when psea.mobisstatus__c isnull then tk.mobisstatus__c else psea.mobisstatus__c end
+						, expecteddelivery__c = case when psea.expecteddelivery__c isnull then tk.expecteddelivery__c else psea.expecteddelivery__c end
+						, purchasepurposeid__c = case when psea.purchasepurposeid__c isnull then tk.purchasepurposeid__c else psea.purchasepurposeid__c end
+						, dealercode__c = case when psea.dealercode__c isnull then tk.dealercode__c else psea.dealercode__c end
+						, creationdt__c = case when psea.created isnull then tk.creationdt__c else psea.created end
+						, ordernum__c = case when psea.ordernum__c isnull then tk.ordernum__c else psea.ordernum__c end
+						, stock__c = case when psea.stock__c isnull then tk.stock__c else psea.stock__c end
+						, priority = case when psea.priority isnull then tk.priority else psea.priority end
+						, description = case when psea.description isnull then tk.description else psea.description end
+						, active_row_id = psea.row_id
+						, external_id__c = param_id
+						, inter_flag = 'if_up'
+					from
+						process.service_event_act psea
+					where 
+						tk.protocol__c = psea.protocol__c 
+					and
+						tk.integrationid__c = psea.integrationid__c
+					and
+						psea.external_id__c = param_id;
+				
+				end if;
+			else
+				
+			end if;
+		end if;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare type_td varchar(30);
+	declare protocol_sr varchar(64);
+	declare protocol_num_td int;	
+	declare protocol_num_qh int;
+	declare protocol_num_case int;
+	declare integrationid_num_tk int;
+	BEGIN
+		
+		select
+			type_cd, protocolid__c  into type_td, protocol_sr
+		from 
+			process.testdrivehistory tdh
+		where 
+			active_row_id = param_id;
+		
+		-- Service Request Number 값(testdrivehistory__c) 확인
+		select
+			count(*) into protocol_num_td
+		from 
+			process.testdrivehistory tdh
+		join 
+			"replica".testdrivehistory_if__c rdh
+			--"replica".testdrivehistory__c rdh
+		on
+			tdh.protocolid__c = rdh.protocolid__c
+		where
+			tdh.active_row_id = param_id;
+		
+		-- Service Request Number 값(case) 확인
+		select
+			count(*) into protocol_num_case
+		from 
+			process.task tk
+		join 
+			"replica"."case" rs
+		on
+			tk.protocol__c = rs.protocol_id__c 
+		where
+			tk.active_row_id = param_id;
+		
+		-- IntegrationId 값(Task) 확인
+		select
+			count(*) into integrationid_num_tk
+		from 
+			process.task tk
+		join 
+			"replica".task rk
+		on
+			tk.integrationid__c  = rk.integrationid__c
+		where
+			tk.active_row_id = param_id;
+		
+		-- Test Drive
+		if type_td = 'Test drive - update' then
+			-- update
+			if protocol_num_td > 0 then
+				--update "replica".testdrivehistory__c rdh set
+				update "replica".testdrivehistory_if__c rdh set 
+					status__c = tdh.status__c
+					, testdrivetype__c = case when tdh.type_cd isnull then rdh.testdrivetype__c else tdh.type_cd end
+				from 
+					process.testdrivehistory tdh
+				where 
+					rdh.protocolid__c = tdh.protocolid__c
+				and
+					tdh.active_row_id = param_id;
+			end if;
+		
+		elseif type_td = 'Test drive - add' then
+			if protocol_num_td > 0 then
+				-- update  
+				--update "replica".testdrivehistory__c rdh set
+				update "replica".testdrivehistory_if__c rdh set 
+					status__c = tdh.status__c
+					, testdrivetype__c = case when tdh.type_cd isnull then rdh.testdrivetype__c else tdh.type_cd end
+					, requestdescription__c = case when tdh."RequestDescription__c" isnull then rdh.requestdescription__c else tdh."RequestDescription__c" end
+				from
+					process.testdrivehistory tdh
+				where 
+					rdh.protocolid__c = tdh.protocolid__c
+				and
+					tdh.active_row_id = param_id;
+			end if;
+		-- Case 
+		else
+			if protocol_num_case > 0 then
+				if integrationid_num_tk = 0 then
+					-- insert 
+					insert into "replica".task
+					(
+						external_id__c
+						, "type"
+						, startdatetime__c
+						, status
+						, protocol_id__c
+						--, result__c
+						--, answer__c
+						--, serialnumber__c
+						--, dpuser__c
+						--, integrationid__c
+						--, hotlineid__c
+						--, hotlinecreation__c
+						--, pwaid__c
+						--, pwacreation__c
+						--, roid__c
+						--, rocreation__c
+						--, mobisid__c
+						--, mobisstatus__c
+						--, expecteddelivery__c
+						--, purchasepurposeid__c
+						--, contactid
+						--, dealercode__c
+						--, creationdt__c
+						--, ordernum__c
+						--, stock__c
+						, priority
+						, description__c
+						, integrationid__c
+					)
+					select
+						row_id
+						, "type"
+						, planneddt__c
+						, status
+						, protocol__c
+						--, result__c
+						--, answer__c
+						--, serialnumber__c
+						--, dpuser__c
+						--, integrationid__c
+						--, hotlineid__c
+						--, hotlinecreation__c
+						--, pwaid__c
+						--, pwacreation__c
+						--, roid__c
+						--, rocreation__c
+						--, mobisid__c
+						--, mobisstatus__c
+						--, expecteddelivery__c
+						--, purchasepurposeid__c
+						--, contactid
+						--, dealercode__c
+						--, creationdt__c
+						--, ordernum__c
+						--, stock__c
+						, priority
+						, description
+						, integrationid__c
+					from 
+						process.task tk
+					where 
+						tk.active_row_id = param_id;
+				else
+					-- update 
+					update "replica".task as rtk set 
+						"type" = case when ptk."type" isnull then rtk."type" else ptk."type" end
+						, startdatetime__c = case when ptk.planneddt__c isnull then rtk.startdatetime__c else ptk.planneddt__c end 
+						, status = case when ptk.status isnull then rtk.status else ptk.status end
+						--, result__c = case when ptk.result__c isnull then rtk.result__c else ptk.result__c end
+						--, answer__c = case when ptk.answer__c isnull then rtk.answer__c else ptk.answer__c end
+						--, dpuser__c = case when ptk.dpuser__c isnull then rtk.dpuser__c else ptk.dpuser__c end
+						--, hotlinecreation__c = case when ptk.hotlinecreation__c isnull then rtk.hotlinecreation__c else ptk.hotlinecreation__c end
+						--, pwacreation__c = case when ptk.pwacreation__c isnull then rtk.pwacreation__c else ptk.pwacreation__c end
+						--, rocreation__c = case when ptk.rocreation__c isnull then rtk.rocreation__c else ptk.rocreation__c end
+						--, mobisstatus__c = case when ptk.mobisstatus__c isnull then rtk.mobisstatus__c else ptk.mobisstatus__c end
+						--, expecteddelivery__c = case when ptk.expecteddelivery__c isnull then rtk.expecteddelivery__c else ptk.expecteddelivery__c end
+						--, purchasepurposeid__c = case when ptk.purchasepurposeid__c isnull then rtk.purchasepurposeid__c else ptk.purchasepurposeid__c end
+						--, dealercode__c = case when ptk.dealercode__c isnull then rtk.dealercode__c else ptk.dealercode__c end
+						--, creationdt__c = case when ptk.creationdt__c isnull then rtk.creationdt__c else ptk.creationdt__c end
+						--, ordernum__c = case when ptk.ordernum__c isnull then rtk.ordernum__c else ptk.ordernum__c end
+						--, stock__c = case when ptk.stock__c isnull then rtk.stock__c else ptk.stock__c end
+						, priority = case when ptk.priority isnull then rtk.priority else ptk.priority end
+						, description__c = case when ptk.description isnull then rtk.description__c else ptk.description end
+					from
+						process.task ptk 
+					where 
+						rtk.integrationid__c = ptk.integrationid__c
+					and
+						rtk.protocol_id__c = ptk.protocol__c
+					and 
+						ptk.active_row_id = param_id;
+				
+				end if;
+			else
+			end if;
+		end if;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_action_in_ws_wf_synergyactionaudit(
+landing.if_action_in_ws_wf
+landing.if_action_in_ws_wf_note(
+landing.if_action_in_ws_wf_products(
+landing.if_action_in_ws_wf(
+process.service_event_act
+process."case"
+process.task
+process.service_request
+process.testdrivehistory
+process.service_event_act(
+"replica".task
+"replica".testdrivehistory__c
+"replica".testdrivehistory_if__c
+"replica"."case"

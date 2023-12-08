@@ -1,0 +1,157 @@
+■ IF033 definition : foundation
+■ IF033 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0028Controller.java
+■ IF033 interfaceMapping    : /api/v1/HMBRegisterLoyaltyBenefitUsedWS
+■ IF033 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0028Mapper.xml
+■ IF033 transferProcess     : process.if_register_loyalty_bnf_used_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{PROC_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF033 transferReplica     : replica.if_register_loyalty_bnf_used_ws(#{PROC_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF033 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0028Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0028Mapper">
+    
+    <select id="getProcRowId" parameterType="IFHMBINNOCEANCDPP0028Dto" resultType="String">
+        select
+            row_id as getProcRowId
+        from
+            process.loyalty_program pl
+        where
+            pl.person_account_id = #{contactId}
+    </select>
+
+    <insert id="insertObject" parameterType="IFHMBINNOCEANCDPP0028Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_register_loyalty_bnf_used_ws
+            (
+                created_by
+                , created
+                , last_upd_by
+                , last_upd
+                , contactid
+                , partnername
+                , partnercnpj
+                , partnerexternalid
+                , benefitname
+                , benefiturl
+                , appsource
+        )values(
+                'interface'
+                , now()
+                , 'interface'
+                , now()
+                , #{contactId}
+                , #{partnerName}
+                , #{partnerCNPJ}
+                , #{partnerExternalId}
+                , #{benefitName}
+                , #{benefitURL}
+                , #{appSource}
+        );
+    </insert>
+
+   
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_register_loyalty_bnf_used_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{PROC_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_register_loyalty_bnf_used_ws(#{PROC_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+    
+
+
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	begin
+		
+		if checkcu = 'insert' then
+			insert into process.loyalty_program
+			(
+				person_account_id
+				, partnername  
+				, partnercnpj 
+				, dealer_account_id 
+				, x_benefit_name__c 
+				, x_benefit_url__c 
+				, x_src_app__c 
+			)
+			select
+				ll.contactid
+				, ll.partnername
+				, ll.partnercnpj 
+				, ll.partnerexternalid 
+				, ll.benefitname
+				, ll.benefiturl
+				, ll.appsource
+			from
+				landing.if_register_loyalty_bnf_used_ws ll
+			where
+				ll.row_id = cast(param_id as Integer);		
+		end if;
+	
+	
+		if checkcu = 'update' then
+			update process.loyalty_program as pl set  
+				x_benefit_name__c = case when ll.benefitname isnull then pl.x_benefit_name__c when ll.benefitname = '' then pl.x_benefit_name__c else ll.benefitname end
+				, x_benefit_url__c  = case when ll.benefiturl isnull then pl.x_benefit_url__c when ll.benefiturl = '' then pl.x_benefit_url__c else ll.benefiturl end 
+				, x_src_app__c = case when ll.appsource isnull then pl.x_src_app__c when ll.appsource = '' then pl.x_src_app__c else ll.appsource end
+			from
+				landing.if_register_loyalty_bnf_used_ws ll
+			where
+				ll.row_id = cast(param_id as Integer)			
+			and
+				pl.row_id = proc_id;
+		end if;
+
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	BEGIN
+
+		if checkcu = 'insert' then
+			insert into "replica".loyaltyprogram__c
+			(
+				external_id__c 
+				, personaccountid__r__external_id__c
+				, dealeraccountid__r__external_id__c 
+				, name__c 
+				, x_benefit_name__c 
+				, x_benefit_url__c 
+				, x_src_app__c 
+			)
+			select
+				pl.row_id
+				, pl.person_account_id
+				, pl.dealer_account_id 
+				, pl.partnername  
+				, pl.x_benefit_name__c
+				, pl.x_benefit_url__c
+				, pl.x_src_app__c
+			from
+				process.loyalty_program pl			
+			where
+				pl.row_id = proc_id;
+			
+		end if;
+	
+	
+	
+		if checkcu = 'update' then
+			update replica.loyaltyprogram__c as rl set 
+				x_benefit_name__c = case when pl.x_benefit_name__c isnull then rl.x_benefit_name__c else pl.x_benefit_name__c end 
+				, x_benefit_url__c = case when pl.x_benefit_url__c isnull then rl.x_benefit_url__c else pl.x_benefit_url__c end 
+				, x_src_app__c  = case when pl.x_src_app__c isnull then rl.x_src_app__c else pl.x_src_app__c end
+			from
+				process.loyalty_program pl
+			where
+				pl.row_id = proc_id
+			and
+				rl.external_id__c = proc_id;
+		end if;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_register_loyalty_bnf_used_ws
+process.loyalty_program
+replica.loyaltyprogram__c
+"replica".loyaltyprogram__c

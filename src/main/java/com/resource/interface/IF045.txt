@@ -1,0 +1,1042 @@
+■ IF045 definition : voc
+■ IF045 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\voc\IFHMBSMARTERSCDPP0036Controller.java
+■ IF045 interfaceMapping    : /api/v1/HMBServiceRequestChatWS
+■ IF045 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSMARTERSCDPP0036Mapper.xml
+■ IF045 transferProcess     : process.if_svc_req_chat_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF045 transferReplica     : "replica".if_svc_req_chat_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF045 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSMARTERSCDPP0036Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSMARTERSCDPP0036Mapper">
+    
+    <insert id="insertServiceRequestChatInput" parameterType="IFHMBSMARTERSCDPP0036Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_service_request_chat_ws(
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , ownedbyid
+            , protocol
+            , reason
+            , level1
+            , level2
+            , level3
+            , level4
+            , source
+            , method
+            , description
+            , status
+            , priority
+            , solution
+            , serialnumber
+            , anonymousflag
+            , contactid
+            , accountid
+            , tendency
+            , satisfaction
+            , dealerid
+            , causingarea
+            , imobilizationdate
+            , relatedmodel
+            , quotedescription
+            , enginetransmission
+            , version
+            , versionprice
+            , color
+            , colorprice
+            , finalprice
+            , carreplacementintention
+            , roadservicerequest
+            , integrationid
+            , tdconfirmed
+            , tdtime
+            , tddate
+            , salesrepid
+            , pneflag
+            , campaignid
+            , sourcetag
+            , estoque
+            , medium
+            , content
+            , campaign
+            , additionalcomments
+            , causingperson
+            , custrepresentative
+            , custrepresentativerel
+            , diagnosisdifficultyflg
+            , diagnosispendingflg
+            , dlrdescription
+            , dlrfup
+            , dlrpending
+            , dlrretractionflg
+            , dlrreversal
+            , hotlineflg
+            , hotlinenum
+            , hotlineopendt
+            , purchaseproposalnum
+            , pwaflg
+            , pwanum
+            , pwaopendt
+            , recurrenceflg
+            , recurrencenum
+            , vehicledeliverydt
+            , vehicledeliveryflg
+            , wantsloan
+            , loantype
+            , installmentsamt
+            , downpayment
+            , usedcarasdownpaymnt
+            , dlrtemperature
+        )
+        values
+        (
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{serviceRequestChatInput.ownedById}
+            , #{serviceRequestChatInput.protocol}
+            , #{serviceRequestChatInput.reason}
+            , #{serviceRequestChatInput.level1}
+            , #{serviceRequestChatInput.level2}
+            , #{serviceRequestChatInput.level3}
+            , #{serviceRequestChatInput.level4}
+            , #{serviceRequestChatInput.source}
+            , #{serviceRequestChatInput.method}
+            , #{serviceRequestChatInput.description}
+            , #{serviceRequestChatInput.status}
+            , #{serviceRequestChatInput.priority}
+            , #{serviceRequestChatInput.solution}
+            , #{serviceRequestChatInput.serialNumber}
+            , #{serviceRequestChatInput.anonymousFlag}
+            , #{serviceRequestChatInput.contactId}
+            , #{serviceRequestChatInput.accountId}
+            , #{serviceRequestChatInput.tendency}
+            , #{serviceRequestChatInput.satisfaction}
+            , #{serviceRequestChatInput.dealerId}
+            , #{serviceRequestChatInput.causingArea}
+            , #{serviceRequestChatInput.imobilizationDate}::timestamp
+            , #{serviceRequestChatInput.relatedModel}
+            , #{serviceRequestChatInput.quoteDescription}
+            , #{serviceRequestChatInput.engineTransmission}
+            , #{serviceRequestChatInput.version}
+            , #{serviceRequestChatInput.versionPrice}
+            , #{serviceRequestChatInput.color}
+            , #{serviceRequestChatInput.colorPrice}
+            , #{serviceRequestChatInput.finalPrice}
+            , #{serviceRequestChatInput.carReplacementIntention}
+            , #{serviceRequestChatInput.roadserviceRequest}
+            , #{serviceRequestChatInput.integrationId}
+            , #{serviceRequestChatInput.tdConfirmed}
+            , #{serviceRequestChatInput.tdTime}
+            , #{serviceRequestChatInput.tdDate}::timestamp
+            , #{serviceRequestChatInput.salesrepId}
+            , #{serviceRequestChatInput.pneFlag}
+            , #{serviceRequestChatInput.campaignId}
+            , #{serviceRequestChatInput.sourceTag}
+            , #{serviceRequestChatInput.estoque}
+            , #{serviceRequestChatInput.medium}
+            , #{serviceRequestChatInput.content}
+            , #{serviceRequestChatInput.campaign}
+            , #{serviceRequestChatInput.additionalComments}
+            , #{serviceRequestChatInput.causingPerson}
+            , #{serviceRequestChatInput.custRepresentative}
+            , #{serviceRequestChatInput.custRepresentativeRel}
+            , #{serviceRequestChatInput.diagnosisDifficultyFlg}
+            , #{serviceRequestChatInput.diagnosisPendingFlg}
+            , #{serviceRequestChatInput.dlrDescription}
+            , #{serviceRequestChatInput.dlrFup}
+            , #{serviceRequestChatInput.dlrPending}
+            , #{serviceRequestChatInput.dlrRetractionFlg}
+            , #{serviceRequestChatInput.dlrReversal}
+            , #{serviceRequestChatInput.hotlineFlg}
+            , #{serviceRequestChatInput.hotlineNum}
+            , #{serviceRequestChatInput.hotlineOpenDt}::timestamp
+            , #{serviceRequestChatInput.purchaseProposalNum}
+            , #{serviceRequestChatInput.pwaFlg}
+            , #{serviceRequestChatInput.pwaNum}
+            , #{serviceRequestChatInput.pwaOpenDt}::timestamp
+            , #{serviceRequestChatInput.recurrenceFlg}
+            , #{serviceRequestChatInput.recurrenceNum}
+            , #{serviceRequestChatInput.vehicleDeliveryDt}::timestamp
+            , #{serviceRequestChatInput.vehicleDeliveryFlg}
+            , #{serviceRequestChatInput.wantsLoan}
+            , #{serviceRequestChatInput.loanType}
+            , #{serviceRequestChatInput.installmentsAmt}
+            , #{serviceRequestChatInput.downPayment}
+            , #{serviceRequestChatInput.usedCarAsDownPaymnt}
+            , #{serviceRequestChatInput.dlrTemperature}
+        )
+    </insert>
+
+    <insert id="insertChat" parameterType="ServiceRequestChatInputDto">
+        insert into landing.if_service_request_chat_ws_chat(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , chatcode
+            , date
+            , source
+            , operator
+        )values       
+        (
+            #{rowId}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{chat.chatCode}
+            , #{chat.date}::timestamp
+            , #{chat.source}
+            , #{chat.operator}
+        )        
+    </insert>
+    
+    <insert id="insertMessage" parameterType="ChatDto">
+        insert into landing.if_service_request_chat_ws_message(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , msgcode
+            , date
+            , sentby
+            , msg
+            , msgstatus
+        )values
+        <foreach collection="listOfMessage" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.msgCode}
+                , #{item.date}::timestamp
+                , #{item.sentBy}
+                , #{item.msg}
+                , #{item.msgStatus}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_svc_req_chat_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <select id="getPocessData" parameterType="IFHMBSMARTERSCDPP0036Dto" resultType="IFHMBSMARTERSCDPP0036Dto">
+        select 
+            row_id as ownedById 
+            , protocol__c as processProtocol
+        from
+            process.service_request
+        where 
+            external_id__c = cast(#{rowId} as text)
+    </select>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call "replica".if_svc_req_chat_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare reason_sr varchar(30);
+	declare level1_sr varchar(30);
+	declare level2_sr varchar(30);
+	declare protocol_sr varchar(64); --ServiceRequset Number
+	declare testdrive_num int;
+	declare quot_num int;
+	declare case_num int;
+	declare srv_req_row_id varchar(30);
+	declare temperaturecheck varchar(30);
+	declare temp_protocol varchar(30);
+	declare sr_row_id int; -- ServiceRequset insert/update 여부 확인
+	begin
+		select 
+			count(*) into sr_row_id 
+		from 
+			landing.if_service_request_chat_ws srww
+		join
+			process.service_request psr
+		on
+			srww.protocol = psr.protocol__c
+		where 
+			srww.row_id = CAST(param_id AS INTEGER);
+		
+		-- reason_sr, level1_sr, level2_sr 별 TestDrive, Quotation, Case 구분
+		select
+		 	reason , level1 , level2 , protocol into reason_sr, level1_sr, level2_sr, protocol_sr
+		from landing.if_service_request_chat_ws
+		where row_id = CAST(param_id AS INTEGER);
+	
+		select 
+			predictive_temp__c , protocol__c into temperaturecheck , temp_protocol
+		from
+			process.service_request psr
+		where 
+			psr.protocol__c = protocol_sr;
+		
+		if coalesce(temperaturecheck) isnull or temperaturecheck = '' then
+			if sr_row_id = 0 then
+				insert into process.service_request(
+					legacy_created
+					, legacy_created_by
+					, legacy_last_upd
+					, legacy_last_upd_by
+					, reason__c
+					, voctype__c
+					, voc_class
+					, voc_level_2__c
+					, voc_level_3__c
+					, origin
+					, "method"
+					, description
+					, status
+					, priority
+					, solution__c
+					, serialnumber
+					, contact_row_id__c
+					, account_row_id__c
+					, tendency__c
+					, customersatisfied__c
+					, business_row_id
+					, causing_area__c
+					, immobilization_date__c
+					, relatedmodel__c
+					, quote_description__c
+					, quotetransmission__c
+					, version__c
+					, quote_version_price__c
+					, quote_color__c
+					, quote_color_price__c
+					, quote_price__c
+					, quote_replace_intention__c
+					, roadservicerequest
+					, integrationid__c
+					, testdrive_confirmed__c
+					, testdrive_time__c
+					, date_test_drive__c
+					, sales_representative_cpf
+					, pne_flag__c
+					, campaignid__c
+					, source_tag__c
+					, stock__c
+					, medium_tag__c
+					, content_tag__c
+					, campaign_tag__c
+					, additional_comments__c
+					, causing_person__c
+					, cust_representative__c
+					, cust_representative_rel__c
+					, diagnosis_difficultyflg__c
+					, diagnosis_pendingflg__c
+					, dlr_fup__c
+					, dlr_pending__c
+					, dlr_retractionflg__c
+					, dlr_reversal__c
+					, hotline_flg__c
+					, hotline_num__c
+					, hotline_open_dt__c
+					, purchase_proposal_num__c
+					, pwa_flg__c
+					, pwa_number__c
+					, pwa_oped_dt__c
+					, recurrence_flg__c
+					, recurrence_num__c
+					, vehicle_delivery_dt__c
+					, vehicle_delivery_flg__c
+					, anonymous_flag__c
+					, dlr_description__c
+					, wants_loan__c
+					, loan_type__c
+					, installments_amt__c
+					, down_payment__c
+					, usedcar_as_down_payment__c
+					, predictive_temp__c
+					, external_id__c
+					, inter_flag
+				)
+				select 
+					created
+				    , created_by
+				    , last_upd
+				    , last_upd_by
+				    , reason
+				    , level1
+				    , level2
+				    , level3
+				    , level4
+				    , source
+				    , method
+				    , description
+					, status
+				    , priority
+				    , solution    
+					, serialnumber
+				    , contactid
+				    , accountid
+				    , tendency
+				    , satisfaction
+				    , dealerid
+				    , causingarea
+				    , imobilizationdate::timestamp		    
+				    , relatedmodel
+				    , quotedescription
+				    , enginetransmission
+				    , version
+				    , versionprice
+				    , color
+				    , colorprice
+				    , finalprice
+				    , carreplacementintention
+				    , roadservicerequest
+				    , integrationid
+				    , CASE when srww.tdconfirmed='Y' then true when srww.tdconfirmed='N' then false else null end tdconfirmed
+				    , tdtime
+				    , tddate::timestamp
+				    , salesrepid
+				    , CASE when srww.pneflag='Y' then true when srww.pneflag='N' then false else null end pneflag
+				    , campaignid
+				    , sourcetag
+				    , estoque
+				    , medium
+				    , content
+				    , campaign
+				    , additionalcomments
+				    , causingperson
+				    , custrepresentative
+				    , custrepresentativerel
+				    , CASE when srww.diagnosisdifficultyflg='Y' then true when srww.diagnosisdifficultyflg='N' then false else null end diagnosisdifficultyflg
+				    , CASE when srww.diagnosispendingflg='Y' then true when srww.diagnosispendingflg='N' then false else null end diagnosispendingflg
+				    , dlrfup
+				    , dlrpending
+				    , CASE when srww.dlrretractionflg='Y' then true when srww.dlrretractionflg='N' then false else null end dlrretractionflg
+				    , dlrreversal
+				    , CASE when srww.hotlineflg='Y' then true when srww.hotlineflg='N' then false else null end hotlineflg
+				    , hotlinenum
+				    , hotlineopendt::timestamp
+				    , purchaseproposalnum
+				    , CASE when srww.pwaflg='Y' then true when srww.pwaflg='N' then false else null end pwaflg
+				    , pwanum
+				    , pwaopendt::timestamp
+				    , CASE when srww.recurrenceflg='Y' then true when srww.recurrenceflg='N' then false else null end recurrenceflg
+				    , recurrencenum
+				    , vehicledeliverydt::timestamp
+				    , CASE when srww.vehicledeliveryflg='Y' then true when srww.vehicledeliveryflg='N' then false else null end vehicledeliveryflg
+				    , CASE when srww.anonymousflag='Y' then true when srww.anonymousflag='N' then false else null end anonymousflag
+				    , dlrdescription
+				    , CASE when srww.wantsloan='Y' then true when srww.wantsloan='N' then false else null end wantsloan
+				    , loantype
+				    , installmentsamt
+				    , downpayment
+				    , CASE when srww.usedcarasdownpaymnt='Y' then true when srww.usedcarasdownpaymnt='N' then false else null end usedcarasdownpaymnt
+				    , dlrtemperature
+				    , row_id
+				    , 'if_in'
+				from
+					landing.if_service_request_chat_ws srww
+				where 
+					srww.row_id = CAST(param_id AS INTEGER);
+				
+				update landing.if_service_request_chat_ws as srww set 
+					protocol = psr.protocol__c
+				from 
+					process.service_request psr
+				where
+					psr.external_id__c = CAST(srww.row_id AS TEXT)
+				and
+					srww.row_id = CAST(param_id AS INTEGER);
+				
+				-- Test Drive 
+				if reason_sr = 'Information' and level1_sr = 'Sales' and level2_sr = 'Test drive' then
+					insert into process.TestDriveHistory
+					(
+						row_id 
+						, reason__c
+						, level1__c
+						, level2__c
+						, level3__c
+						, level4__c
+						, "SourceTag__c"
+						, method__c
+						, "RequestDescription__c"
+						, status__c
+						, dealercode__c
+						, serialnumber__c
+						, salespersoncode__c
+						, testdriverequestdate__c
+						, testdriverequesttime__c
+						, testdriveconfirmed__c
+						, account_id__c
+						, contact_id__c
+						, protocolid__c
+						, external_id__c
+						, dealerportaltdno__c
+						, testdriverequestdatetime__c
+						, inter_flag
+					)
+					select 
+						row_id
+						, reason__c
+						, voctype__c
+						, voc_class
+						, voc_level_2__c
+						, voc_level_3__c
+						, origin
+						, "method"
+						, description
+						, status
+						, dealerCode__c
+						, serialnumber
+						, sales_representative_cpf
+						, date_test_drive__c
+						, testdrive_time__c
+						, testdrive_confirmed__c
+						, account_row_id__c
+						, contact_row_id__c
+						, protocol__c
+						, row_id
+						, integrationid__c
+						, date_test_drive__c
+						, 'if_in'
+					from
+						process.service_request psr
+					where
+						psr.external_id__c = param_id;
+				-- Quotation
+				elseif reason_sr = 'Sales opportunity' and level1_sr = 'Sales' and level2_sr = 'Request a quote' then
+					insert into process.quotehistory
+					(
+						row_id 
+						, protocolid__c
+						, reason__c
+						, level1__c
+						, level2__c
+						, level3__c
+						, level4__c
+						, "SourceTag__c"
+						, method__c
+						, requestdescription__c
+						, status__c
+						, dealercode__c
+						, relatedmodel__c
+						, enginetransmission__c
+						, version__c
+						, carversionprice__c
+						, color__c
+						, colorprice
+						, finalprice
+						, carreplacementintention
+						, pneflag__c
+						, campaign_id
+						, account_id
+						, contact_id
+						, external_id__c
+						, inter_flag
+					)
+					select 
+						row_id
+						, protocol__c
+						, reason__c
+						, voctype__c
+						, voc_class
+						, voc_level_2__c
+						, voc_level_3__c
+						, origin
+						, "method"
+						, description
+						, status
+						, dealerCode__c
+						, relatedmodel__c
+						, quotetransmission__c
+						, version__c
+						, quote_version_price__c
+						, quote_color__c
+						, quote_color_price__c
+		        		, quote_price__c
+		        		, quote_replace_intention__c
+		        		, CASE when psr.pne_flag__c='Y' then true when psr.pne_flag__c='N' then false else null end pne_flag__c
+		        		, campaignid__c
+		        		, account_row_id__c
+						, contact_row_id__c
+		        		, row_id
+		        		, 'if_in'
+					from
+						process.service_request psr
+					where 
+						psr.external_id__c = param_id;	
+				-- Case
+				else
+					insert into process."case"
+					(
+						row_id 
+						, protocol__c
+						, service_request_reason__c
+						, voctype__c
+						, voc_class
+						, voc_level_2__c
+						, voc_level_3__c
+						, origin
+						, source__c
+						, description
+						, status
+						, priority
+						, resolution__c
+						, anonymous__c
+						, account_row_id__c
+						, contact_row_id__c
+						, sr_impact_cd__c
+						, customersatisfied__c
+						, business_row_id
+						, causing_area__c
+						, date_of_immobilization__c
+						, relatedModel__c
+						, x_quote_desc__c
+						, engine_transmission__c
+						, version__c
+						, car_version_price__c
+						, color__c
+						, colorprice__c
+						, unit_value__c
+						, car_replacement_intention__c
+						, rsa_integration_id
+						, integrationid__c
+						, test_drive_confirmed__c
+						, time_test_drive__c
+						, date_test_drive__c
+						, salesrepid__c
+						, pne_flg__c
+						, campaignid__c
+						, source_tag__c
+						, stock_tag__c
+						, medium_tag__c
+						, content_tag__c
+						, campaign_tag__c
+						, add_comment__c
+						, causing_person__c
+						, customer_rep__c
+						, customer_rep_rel__c
+						, diagnosis_difficulty__c
+						, diagnosis_pending__c
+						, dlr_response__c
+						, dlr_fup__c
+						, serialnumber__c
+						, asset_id
+						, external__c
+						, inter_flag
+					)
+					select
+						row_id 
+						, protocol__c
+						, reason__c
+						, voctype__c
+						, voc_class
+						, voc_level_2__c
+						, voc_level_3__c
+						, "method"
+						, origin
+						, description
+						, status
+						, priority
+						, solution__c
+						, CASE when anonymous_flag__c='Y' then true when anonymous_flag__c='N' then false else null end anonymousflag
+						, account_row_id__c
+						, contact_row_id__c
+						, tendency__c
+						, customersatisfied__c
+						, dealerCode__c
+						, causing_area__c
+						, immobilization_date__c
+						, relatedmodel__c
+						, quote_description__c
+						, quotetransmission__c
+						, version__c
+						, quote_version_price__c
+						, quote_color__c
+						, quote_color_price__c
+						, cast(quote_price__c as integer)
+						, quote_replace_intention__c
+						, roadservicerequest
+						, integrationid__c
+						, CASE when testdrive_confirmed__c='Y' then true when testdrive_confirmed__c='N' then false else null end testdrive_confirmed__c
+						, testdrive_time__c
+						, date_test_drive__c
+						, sales_representative_cpf
+						, CASE when pne_flag__c='Y' then true when pne_flag__c='N' then false else null end pne_flag__c
+						, campaignid__c
+						, source_tag__c
+						, stock__c
+						, medium_tag__c
+						, content_tag__c
+						, campaign_tag__c
+						, additional_comments__c
+						, causing_person__c
+						, cust_representative__c
+						, cust_representative_rel__c
+						, CASE when diagnosis_difficultyflg__c='Y' then true when diagnosis_difficultyflg__c='N' then false else null end diagnosis_difficultyflg__c
+						, CASE when diagnosis_pendingflg__c='Y' then true when diagnosis_pendingflg__c='N' then false else null end diagnosis_pendingflg__c
+						, dlr_description__c
+						, dlr_fup__c
+						, serialnumber
+						, (select row_id from process.asset where serialnumber = serialnumber limit 1)
+						, row_id
+						, 'if_in'
+					from process.service_request psr
+					where
+						psr.external_id__c = param_id;
+					
+					
+					insert into process.cx_chat
+					(
+						created
+						, created_by
+						, last_upd
+						, last_upd_by
+						, chat_date
+						, chat_cd
+						, description
+						, "source"
+						, user_name
+						, protocol__c
+						, inter_flag
+					)
+					select
+						created
+						, created_by
+						, last_upd
+						, last_upd_by
+						, "date"::timestamp
+						, chatcode
+						, proc_result_msg
+						, "source"
+						, "operator"
+						, (select pc.protocol__c  from process."case" pc	join process.service_request ps on pc.protocol__c = ps.protocol__c where ps.external_id__c  = param_id)
+						, 'if_in'
+					from
+						landing.if_service_request_chat_ws_chat srcwc
+					where  
+						srcwc.par_row_id = CAST(param_id AS INTEGER);
+					
+					
+					insert into process.cx_chat_message
+					(
+						created
+						, created_by
+						, last_upd
+						, last_upd_by
+						, "name"
+						, msg_dt
+						, db_last_upd_src
+						, msg_cd
+						, msg_text
+						, status
+						, protocol__c
+						, inter_flag
+					)
+					select
+						created
+						, created_by
+						, last_upd
+						, last_upd_by
+						, msgcode
+						, "date"::timestamp
+						, proc_result_yn
+						, msgcode
+						, msg
+						, msgstatus
+						, (select pc.protocol__c  from process."case" pc	join process.service_request ps on pc.protocol__c = ps.protocol__c where ps.external_id__c  = param_id)
+						, 'if_in'
+					from
+						landing.if_service_request_chat_ws_message srcwm
+					where 
+						srcwm.par_row_id = CAST(param_id AS INTEGER);
+				end if;
+					
+			else
+				update process.service_request as psr set 
+					legacy_last_upd  = srww.last_upd
+					, legacy_last_upd_by = srww.last_upd_by
+					, origin = case when srww.source isnull then psr.origin else srww.source end
+					, "method" = case when srww.method isnull then psr."method" else srww.method end
+					, description = case when srww.description isnull then psr.description else srww.description end
+					, status = case when srww.status isnull then psr.status else srww.status end
+					, priority = case when srww.priority isnull then psr.priority else srww.priority end
+					, solution__c = case when srww.solution isnull then psr.solution__c else srww.solution end
+					, anonymous_flag__c = CASE when srww.anonymousflag='Y' then true when srww.anonymousflag='N' then false else anonymous_flag__c end
+					, serialnumber = case when srww.serialnumber isnull then psr.serialnumber else srww.serialnumber end
+					, account_row_id__c = case when srww.accountid isnull then psr.account_row_id__c else srww.accountid end
+					, tendency__c = case when srww.tendency isnull then psr.tendency__c else srww.tendency end
+					, customersatisfied__c = case when srww.satisfaction isnull then psr.customersatisfied__c else srww.satisfaction end
+					, business_row_id = case when srww.dealerid isnull then psr.business_row_id else srww.dealerid end
+					, causing_area__c = case when srww.causingarea isnull then psr.causing_area__c else srww.causingarea end
+					, immobilization_date__c = case when srww.imobilizationdate isnull then psr.immobilization_date__c else srww.imobilizationdate::timestamp end
+					, relatedmodel__c = case when srww.relatedmodel isnull then psr.relatedmodel__c else srww.relatedmodel end
+					, quote_description__c = case when srww.quotedescription isnull then psr.quote_description__c else srww.quotedescription end
+					, quotetransmission__c = case when srww.enginetransmission isnull then psr.quotetransmission__c else srww.enginetransmission end
+					, version__c = case when srww.version isnull then psr.version__c else srww.version end
+					, quote_version_price__c = case when srww.versionprice isnull then psr.quote_version_price__c else srww.versionprice end
+					, quote_color__c = case when srww.color isnull then psr.quote_color__c else srww.color end
+					, quote_color_price__c = case when srww.colorprice isnull then psr.quote_color_price__c else srww.colorprice end
+					, quote_price__c = case when srww.finalprice isnull then psr.quote_price__c else srww.finalprice end
+					, quote_replace_intention__c = case when srww.carreplacementintention isnull then psr.quote_replace_intention__c else srww.carreplacementintention end
+					, roadservicerequest = case when srww.roadservicerequest isnull then psr.roadservicerequest else srww.roadservicerequest end
+					, integrationid__c = case when srww.integrationid isnull then psr.integrationid__c else srww.integrationid end
+					, testdrive_confirmed__c = CASE when srww.tdconfirmed='Y' then true when srww.tdconfirmed='N' then false else testdrive_confirmed__c end
+					, testdrive_time__c = case when srww.tdtime isnull then psr.testdrive_time__c else srww.tdtime end
+					, date_test_drive__c = case when srww.tddate isnull then psr.date_test_drive__c else srww.tddate::timestamp end
+					, sales_representative_cpf = case when srww.salesrepid isnull then psr.sales_representative_cpf else srww.salesrepid end				
+					, pne_flag__c = CASE when srww.pneflag='Y' then true when srww.pneflag='N' then false else pne_flag__c end
+					, campaignid__c = case when srww.campaignid isnull then psr.campaignid__c else srww.campaignid end
+					, source_tag__c = case when srww.sourcetag isnull then psr.source_tag__c else srww.sourcetag end
+					, stock__c = case when srww.estoque isnull then psr.stock__c else srww.estoque end
+					, medium_tag__c = case when srww.medium isnull then psr.medium_tag__c else srww.medium end
+					, content_tag__c = case when srww.content isnull then psr.content_tag__c else srww.content end
+					, campaign_tag__c = case when srww.campaign isnull then psr.campaign_tag__c else srww.campaign end
+					, additional_comments__c = case when srww.additionalcomments isnull then psr.additional_comments__c else srww.additionalcomments end
+					, causing_person__c = case when srww.causingperson isnull then psr.causing_person__c else srww.causingperson end
+					, cust_representative__c = case when srww.custrepresentative isnull then psr.cust_representative__c else srww.custrepresentative end
+					, cust_representative_rel__c = case when srww.custrepresentativerel isnull then psr.cust_representative_rel__c else srww.custrepresentativerel end				
+					, diagnosis_difficultyflg__c = CASE when srww.diagnosisdifficultyflg ='Y' then true when srww.diagnosisdifficultyflg ='N' then false else diagnosis_difficultyflg__c end				
+					, diagnosis_pendingflg__c = CASE when srww.diagnosispendingflg ='Y' then true when srww.diagnosispendingflg ='N' then false else diagnosis_pendingflg__c end
+					, dlr_fup__c = case when srww.dlrfup isnull then psr.dlr_fup__c else srww.dlrfup end
+					, dlr_pending__c = case when srww.dlrpending isnull then psr.dlr_pending__c else srww.dlrpending end				
+					, dlr_retractionflg__c = CASE when srww.dlrretractionflg ='Y' then true when srww.dlrretractionflg ='N' then false else dlr_retractionflg__c end
+					, dlr_reversal__c = case when srww.dlrreversal isnull then psr.dlr_reversal__c else srww.dlrreversal end				
+					, hotline_flg__c = CASE when srww.hotlineflg ='Y' then true when srww.hotlineflg ='N' then false else hotline_flg__c end
+					, hotline_num__c = case when srww.hotlinenum isnull then psr.hotline_num__c else srww.hotlinenum end
+					, hotline_open_dt__c = case when srww.hotlineopendt isnull then psr.hotline_open_dt__c else srww.hotlineopendt::timestamp end
+					, purchase_proposal_num__c = case when srww.purchaseproposalnum isnull then psr.purchase_proposal_num__c else srww.purchaseproposalnum end				
+					, pwa_flg__c = CASE when srww.pwaflg ='Y' then true when srww.pwaflg ='N' then false else pwa_flg__c end
+					, pwa_number__c = case when srww.pwanum isnull then psr.pwa_number__c else srww.pwanum end
+					, pwa_oped_dt__c = case when srww.pwaopendt isnull then psr.pwa_oped_dt__c else srww.pwaopendt::timestamp end				
+					, recurrence_flg__c = CASE when srww.recurrenceflg ='Y' then true when srww.recurrenceflg ='N' then false else recurrence_flg__c end
+					, recurrence_num__c = case when srww.recurrencenum isnull then psr.recurrence_num__c else srww.recurrencenum end
+					, vehicle_delivery_dt__c = case when srww.vehicledeliverydt isnull then psr.vehicle_delivery_dt__c else srww.vehicledeliverydt::timestamp end				
+					, vehicle_delivery_flg__c = CASE when srww.vehicledeliveryflg ='Y' then true when srww.vehicledeliveryflg ='N' then false else vehicle_delivery_flg__c end
+					, wants_loan__c = CASE when srww.wantsloan ='Y' then true when srww.wantsloan ='N' then false else wants_loan__c end
+					, loan_type__c = case when srww.loantype isnull then psr.loan_type__c else srww.loantype end
+					, installments_amt__c = case when srww.installmentsamt isnull then psr.installments_amt__c else srww.installmentsamt end
+					, down_payment__c = case when srww.downpayment isnull then psr.down_payment__c else srww.downpayment end
+					, usedcar_as_down_payment__c = CASE when srww.usedcarasdownpaymnt='Y' then true when srww.usedcarasdownpaymnt='N' then false else usedcar_as_down_payment__c end
+					, predictive_temp__c = case when srww.dlrtemperature isnull then psr.predictive_temp__c else srww.dlrtemperature end
+					, external_id__c = srww.row_id
+					, inter_flag = 'if_up'
+				from
+					landing.if_service_request_chat_ws srww
+				where 
+					psr.protocol__c = srww.protocol
+				and
+					srww.row_id = CAST(param_id AS INTEGER);
+				
+				update process.case pca set 
+					voc_level_2__c = case when psr.voc_level_2__c isnull then pca.voc_level_2__c else psr.voc_level_2__c end
+					, voc_level_3__c = case when psr.voc_level_3__c isnull then pca.voc_level_3__c else psr.voc_level_3__c end
+					, origin = case when psr."method" isnull then pca.origin else psr."method" end
+					, source__c = case when psr.origin isnull then pca.source__c else psr.origin end
+					, description = case when psr.description isnull then pca.description else psr.description end
+					, status = case when psr.status isnull then pca.status else psr.status end
+					, priority = case when psr.priority isnull then pca.priority else psr.priority end
+					, resolution__c = case when psr.solution__c isnull then pca.resolution__c else psr.solution__c end
+					, anonymous__c = CASE when psr.anonymous_flag__c='Y' then true when psr.anonymous_flag__c='N' then false else anonymous__c end
+					, account_row_id__c = case when psr.account_row_id__c isnull then pca.account_row_id__c else psr.account_row_id__c end
+					, sr_impact_cd__c = case when psr.tendency__c isnull then pca.sr_impact_cd__c else psr.tendency__c end
+					, customersatisfied__c = case when psr.customersatisfied__c isnull then pca.customersatisfied__c else psr.customersatisfied__c end
+					, dealercode__c = case when psr.dealerCode__c isnull then pca.dealercode__c else psr.dealerCode__c end
+					, causing_area__c = case when psr.causing_area__c isnull then pca.causing_area__c else psr.causing_area__c end
+					, date_of_immobilization__c = case when psr.immobilization_date__c isnull then pca.date_of_immobilization__c else psr.immobilization_date__c end
+					, relatedModel__c = case when psr.relatedmodel__c isnull then pca.relatedModel__c else psr.relatedmodel__c end
+					, x_quote_desc__c = case when psr.quote_description__c isnull then pca.x_quote_desc__c else psr.quote_description__c end
+					, engine_transmission__c = case when psr.quotetransmission__c isnull then pca.engine_transmission__c else psr.quotetransmission__c end
+					, version__c = case when psr.version__c isnull then pca.version__c else psr.version__c end
+					, car_version_price__c = case when psr.quote_version_price__c isnull then pca.car_version_price__c else psr.quote_version_price__c end
+					, color__c = case when psr.quote_color__c isnull then pca.color__c else psr.quote_color__c end
+					, colorprice__c = case when psr.quote_color_price__c isnull then pca.colorprice__c else psr.quote_color_price__c end
+					, unit_value__c = case when cast(psr.quote_price__c as integer) isnull then pca.unit_value__c else cast(psr.quote_price__c as integer) end
+					, car_replacement_intention__c = case when psr.quote_replace_intention__c isnull then pca.car_replacement_intention__c else psr.quote_replace_intention__c end
+					, rsa_integration_id = case when psr.roadservicerequest isnull then pca.rsa_integration_id else psr.roadservicerequest end
+					, integrationid__c = case when psr.integrationid__c isnull then pca.integrationid__c else psr.integrationid__c end
+					, test_drive_confirmed__c = CASE when psr.testdrive_confirmed__c='Y' then true when psr.testdrive_confirmed__c='N' then false else test_drive_confirmed__c end
+					, time_test_drive__c = case when psr.testdrive_time__c isnull then pca.time_test_drive__c else psr.testdrive_time__c end
+					, date_test_drive__c = case when psr.date_test_drive__c isnull then pca.date_test_drive__c else psr.date_test_drive__c end
+					, salesrepid__c = case when psr.sales_representative_cpf isnull then pca.salesrepid__c else psr.sales_representative_cpf end
+					, pne_flg__c = CASE when psr.pne_flag__c='Y' then true when psr.pne_flag__c='N' then false else pne_flg__c end
+					, campaignid__c = case when psr.campaignid__c isnull then pca.campaignid__c else psr.campaignid__c end
+					, source_tag__c = case when psr.source_tag__c isnull then pca.source_tag__c else psr.source_tag__c end
+					, stock_tag__c = case when psr.stock__c isnull then pca.stock_tag__c else psr.stock__c end
+					, medium_tag__c = case when psr.medium_tag__c isnull then pca.medium_tag__c else psr.medium_tag__c end
+					, content_tag__c = case when psr.content_tag__c isnull then pca.content_tag__c else psr.content_tag__c end
+					, campaign_tag__c = case when psr.campaign_tag__c isnull then pca.campaign_tag__c else psr.campaign_tag__c end
+					, add_comment__c = case when psr.additional_comments__c isnull then pca.add_comment__c else psr.additional_comments__c end
+					, causing_person__c = case when psr.causing_person__c isnull then pca.causing_person__c else psr.causing_person__c end
+					, customer_rep__c = case when psr.cust_representative__c isnull then pca.customer_rep__c else psr.cust_representative__c end
+					, customer_rep_rel__c = case when psr.cust_representative_rel__c isnull then pca.customer_rep_rel__c else psr.cust_representative_rel__c end
+					, diagnosis_difficulty__c = CASE when psr.diagnosis_difficultyflg__c='Y' then true when psr.diagnosis_difficultyflg__c='N' then false else diagnosis_difficulty__c end
+					, diagnosis_pending__c = CASE when psr.diagnosis_pendingflg__c='Y' then true when psr.diagnosis_pendingflg__c='N' then false else diagnosis_pending__c end
+					, dlr_response__c = case when psr.dlr_description__c isnull then pca.dlr_response__c else psr.dlr_description__c end
+					, dlr_fup__c = case when psr.dlr_fup__c isnull then pca.dlr_fup__c else psr.dlr_fup__c end
+					, serialnumber__c = case when psr.serialnumber isnull then pca.serialnumber__c else psr.serialnumber end
+					, asset_id = case when psr.serialnumber isnull then pca.asset_id else (select row_id from process.asset where serialnumber = serialnumber limit 1) end
+					, inter_flag = 'if_up'
+				from 
+					process.service_request psr
+				where 
+					pca.protocol__c = psr.protocol__c
+				and
+					psr.protocol__c = protocol_sr;
+						
+					if (reason_sr != 'Information' and level1_sr != 'Sales' and level2_sr != 'Test drive') or (reason_sr != 'Sales opportunity' and level1_sr != 'Sales' and level2_sr != 'Request a quote') or (reason_sr != 'Sales opportunity' and level1_sr != 'Visitor' and level2_sr != 'Dealer') or (reason_sr != 'Sales opportunity' and level1_sr != 'Marketing' and level2_sr != 'Promotion') then
+					
+						update process.case pca set 
+							voc_level_2__c = case when psr.voc_level_2__c isnull then pca.voc_level_2__c else psr.voc_level_2__c end
+							, voc_level_3__c = case when psr.voc_level_3__c isnull then pca.voc_level_3__c else psr.voc_level_3__c end
+							, origin = case when psr."method" isnull then pca.origin else psr."method" end
+							, source__c = case when psr.origin isnull then pca.source__c else psr.origin end
+							, description = case when psr.description isnull then pca.description else psr.description end
+							, status = case when psr.status isnull then pca.status else psr.status end
+							, priority = case when psr.priority isnull then pca.priority else psr.priority end
+							, resolution__c = case when psr.solution__c isnull then pca.resolution__c else psr.solution__c end
+							, anonymous__c = CASE when psr.anonymous_flag__c='Y' then true when psr.anonymous_flag__c='N' then false else anonymous__c end
+							, account_row_id__c = case when psr.account_row_id__c isnull then pca.account_row_id__c else psr.account_row_id__c end
+							, sr_impact_cd__c = case when psr.tendency__c isnull then pca.sr_impact_cd__c else psr.tendency__c end
+							, customersatisfied__c = case when psr.customersatisfied__c isnull then pca.customersatisfied__c else psr.customersatisfied__c end
+							, dealercode__c = case when psr.dealerCode__c isnull then pca.dealercode__c else psr.dealerCode__c end
+							, causing_area__c = case when psr.causing_area__c isnull then pca.causing_area__c else psr.causing_area__c end
+							, date_of_immobilization__c = case when psr.immobilization_date__c isnull then pca.date_of_immobilization__c else psr.immobilization_date__c end
+							, relatedModel__c = case when psr.relatedmodel__c isnull then pca.relatedModel__c else psr.relatedmodel__c end
+							, x_quote_desc__c = case when psr.quote_description__c isnull then pca.x_quote_desc__c else psr.quote_description__c end
+							, engine_transmission__c = case when psr.quotetransmission__c isnull then pca.engine_transmission__c else psr.quotetransmission__c end
+							, version__c = case when psr.version__c isnull then pca.version__c else psr.version__c end
+							, car_version_price__c = case when psr.quote_version_price__c isnull then pca.car_version_price__c else psr.quote_version_price__c end
+							, color__c = case when psr.quote_color__c isnull then pca.color__c else psr.quote_color__c end
+							, colorprice__c = case when psr.quote_color_price__c isnull then pca.colorprice__c else psr.quote_color_price__c end
+							, unit_value__c = case when cast(psr.quote_price__c as integer) isnull then pca.unit_value__c else cast(psr.quote_price__c as integer) end
+							, car_replacement_intention__c = case when psr.quote_replace_intention__c isnull then pca.car_replacement_intention__c else psr.quote_replace_intention__c end
+							, rsa_integration_id = case when psr.roadservicerequest isnull then pca.rsa_integration_id else psr.roadservicerequest end
+							, integrationid__c = case when psr.integrationid__c isnull then pca.integrationid__c else psr.integrationid__c end
+							, test_drive_confirmed__c = CASE when psr.testdrive_confirmed__c='Y' then true when psr.testdrive_confirmed__c='N' then false else test_drive_confirmed__c end
+							, time_test_drive__c = case when psr.testdrive_time__c isnull then pca.time_test_drive__c else psr.testdrive_time__c end
+							, date_test_drive__c = case when psr.date_test_drive__c isnull then pca.date_test_drive__c else psr.date_test_drive__c end
+							, salesrepid__c = case when psr.sales_representative_cpf isnull then pca.salesrepid__c else psr.sales_representative_cpf end
+							, pne_flg__c = CASE when psr.pne_flag__c='Y' then true when psr.pne_flag__c='N' then false else pne_flg__c end
+							, campaignid__c = case when psr.campaignid__c isnull then pca.campaignid__c else psr.campaignid__c end
+							, source_tag__c = case when psr.source_tag__c isnull then pca.source_tag__c else psr.source_tag__c end
+							, stock_tag__c = case when psr.stock__c isnull then pca.stock_tag__c else psr.stock__c end
+							, medium_tag__c = case when psr.medium_tag__c isnull then pca.medium_tag__c else psr.medium_tag__c end
+							, content_tag__c = case when psr.content_tag__c isnull then pca.content_tag__c else psr.content_tag__c end
+							, campaign_tag__c = case when psr.campaign_tag__c isnull then pca.campaign_tag__c else psr.campaign_tag__c end
+							, add_comment__c = case when psr.additional_comments__c isnull then pca.add_comment__c else psr.additional_comments__c end
+							, causing_person__c = case when psr.causing_person__c isnull then pca.causing_person__c else psr.causing_person__c end
+							, customer_rep__c = case when psr.cust_representative__c isnull then pca.customer_rep__c else psr.cust_representative__c end
+							, customer_rep_rel__c = case when psr.cust_representative_rel__c isnull then pca.customer_rep_rel__c else psr.cust_representative_rel__c end
+							, diagnosis_difficulty__c = CASE when psr.diagnosis_difficultyflg__c='Y' then true when psr.diagnosis_difficultyflg__c='N' then false else diagnosis_difficulty__c end
+							, diagnosis_pending__c = CASE when psr.diagnosis_pendingflg__c='Y' then true when psr.diagnosis_pendingflg__c='N' then false else diagnosis_pending__c end
+							, dlr_response__c = case when psr.dlr_description__c isnull then pca.dlr_response__c else psr.dlr_description__c end
+							, dlr_fup__c = case when psr.dlr_fup__c isnull then pca.dlr_fup__c else psr.dlr_fup__c end
+							, serialnumber__c = case when psr.serialnumber isnull then pca.serialnumber__c else psr.serialnumber end
+							, asset_id = case when psr.serialnumber isnull then pca.asset_id else (select row_id from process.asset where serialnumber = serialnumber limit 1) end
+							, inter_flag = 'if_up'
+						from 
+							process.service_request psr
+						where 
+							pca.protocol__c = psr.protocol__c
+						and
+							psr.protocol__c = protocol_sr;
+						
+						insert into process.cx_chat
+						(
+							created
+							, created_by
+							, last_upd
+							, last_upd_by
+							, chat_date
+							, chat_cd
+							, description
+							, "source"
+							, user_name
+							, protocol__c
+							, inter_flag
+						)
+						select
+							created
+							, created_by
+							, last_upd
+							, last_upd_by
+							, "date"::timestamp
+							, chatcode
+							, proc_result_msg
+							, "source"
+							, "operator"
+							, (select pc.protocol__c  from process."case" pc	join process.service_request ps on pc.protocol__c = ps.protocol__c where ps.external_id__c  = param_id)
+							, 'if_in'
+						from
+							landing.if_service_request_chat_ws_chat srcwc
+						where  
+							srcwc.par_row_id = CAST(param_id AS INTEGER);
+						
+						
+						insert into process.cx_chat_message
+						(
+							created
+							, created_by
+							, last_upd
+							, last_upd_by
+							, "name"
+							, msg_dt
+							, db_last_upd_src
+							, msg_cd
+							, msg_text
+							, status
+							, protocol__c
+							, inter_flag
+						)
+						select						
+							created
+							, created_by
+							, last_upd
+							, last_upd_by
+							, msgcode
+							, "date"::timestamp
+							, proc_result_yn
+							, msgcode
+							, msg
+							, msgstatus
+							, (select pc.protocol__c  from process."case" pc	join process.service_request ps on pc.protocol__c = ps.protocol__c where ps.external_id__c  = param_id)
+							, 'if_in'
+						from
+							landing.if_service_request_chat_ws_message srcwm
+						where 
+							srcwm.par_row_id = CAST(param_id AS INTEGER);
+					end if;
+				end if;
+		else
+			update process.service_request psr set
+				predictive_temp__c = case when srww.dlrtemperature = 'F' then 'Hot' when srww.dlrtemperature = 'Q' then 'Cold' when srww.dlrtemperature = 'M' then 'Warm' else null end
+				, inter_flag = 'if_up'
+			from
+				landing.if_service_request_chat_ws srww
+			where 
+				psr.protocol__c = temp_protocol
+			and
+				srww.row_id = CAST(param_id AS INTEGER);
+			
+			update process.opportunity po set 
+				 predictive_temp__c = case when srww.dlrtemperature = 'F' then 'Hot' when srww.dlrtemperature = 'Q' then 'Cold' when srww.dlrtemperature = 'M' then 'Warm' else null end
+				 , external_id__c = srww.row_id 
+				 , inter_flag = 'if_up'
+			from 
+				landing.if_service_request_chat_ws srww
+			where 
+				po.testdriveprotocolid__c = temp_protocol
+			and
+				srww.row_id = CAST(param_id AS INTEGER);			
+			
+		end if;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+

@@ -3,8 +3,6 @@ package com.anchors.database;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 
 
 public class Temp {
@@ -25,12 +23,13 @@ public class Temp {
     	test1();
     }
     public void test1() {
-//    	String str = " response = ObjectUtils.isNotEmpty(resultDto) ? defaultMapper.map(resultDto, IFHMBSAPEAICDPP0003Payload.Response.class) : null; ";
-    	String str = " process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN},#{PARAM_ID,jdbcType=VARCHAR,mode=IN}); ";
+    	String str = " response = ObjectUtils.isNotEmpty(resultDto) ? defaultMapper.map(resultDto, IFHMBSAPEAICDPP0003Payload.Response.class) : null; ";
+//    	String str = " process.if_product_in_wf(#{PARAM_ID,jdbcType=VARCHAR,mode=IN},#{PARAM_ID,jdbcType=VARCHAR,mode=IN}); ";
     	
     	   
 //    	String str = "|마이크로소프트||애플||페이스북||네이버|";
-    	Pattern pattern = Pattern.compile("[#{](.*)[}]");
+//    	Pattern pattern = Pattern.compile("[#{](.*)[}]");
+    	Pattern pattern = Pattern.compile("[(](.*)[)]");
 
     	Matcher matcher = pattern.matcher(str);
 

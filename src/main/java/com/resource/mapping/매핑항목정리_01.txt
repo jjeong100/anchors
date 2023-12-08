@@ -1,0 +1,46 @@
+action                              Object
+    integrationId                       Action Activity UID Char
+    result                      Service request/action  Char
+    answer                      Comment For Dealer  Char
+    status                      Action Status   Char
+    hotlineId                       Action inbound interface    Char
+    hotlineCreation                     Action inbound interface    DateTime
+    pwaId                       Action inbound interface    Char
+    pwaCreation                     Created for Call Report DateTime
+    roId                        Action inbound interface    Char
+    roCreation                      Action inbound interface    DateTime
+    mobisId                     Action inbound interface    Char
+    mobisStatus                     Action inbound interface    Char
+    expectedDelivery                        Action inbound interface    DateTime
+    purchasePurposeId                       Action inbound interface    Char
+    type                        Action Type Char
+    srProtocol                      Protocol Numer  Char
+    priority                        Action Priority Char
+    owner                       Action Owner    Char
+    description                     Comment Char
+    contactId                       Action Contact Id   Char
+    dealerCode                      Action Dealer Code  Char
+    serialNumber                        Serial Number   Char
+    creationDate                        Action Created  DateTime
+    plannedDt                       Follow-up Date      DateTime
+    orderNum                        Action Order Numero Char
+    dpUser                      action inbound interface    Char
+    estoque                     stock   Char
+actionNote                              Object
+    noteType                        Action Note type    Char
+    noteDate                        Action Note date    DateTime
+    noteDescription                     Action Note Description Char
+    noteCreator                     Action Note Creator Char
+actionProducts                              Object
+    partId                      Action Product Part Id  Char
+    partQty                     Action Product Part Quantity    Number
+synergyActionAudit                              Object
+    fieldName                       Action Audit Name   Char
+    fieldValue                      Action Audit Vallue Char
+                                
+                                
+                                
+                                
+actionId                            Connex Action Id    Char
+errorSpcCode                            Connex error code. Code 0 means success.    Char
+errorSpcMessage                         Connex error message.   Char

@@ -1,8 +1,10 @@
 package com.anchors.database;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.project.common.PostgreSql;
 
@@ -10,22 +12,28 @@ public class DEV항목정보 {
 	public static void main(String[] args) {
         final String className = new Object(){}.getClass().getEnclosingClass().getName();
         System.out.println("------------------------------ "+className+" ------------------- St.");
-        String serviceName = "dev_prod";//
-        String serverType  = "dev";
+        String serviceName = "prod";//
+        String serverType  = "server";
         
-        String table   = "process.loyalty_program";
-        String column  = "partnercnpj";
+//        String serviceName = "prod";//
+//        String serverType  = "dev";
+        
+//        String serviceName = "local";//
+//      String serverType  = "local";
+        
+        String table   = "process.account";
+        String column  = "billingstreet_3__c";
         
         
         String schemas = "";
-        if("dev_prod".equals(serviceName))      schemas = "process";
-        else if("dev_dump".equals(serviceName)) schemas = "landing";
-        else if("dev_repl".equals(serviceName)) schemas = "replica";
+        String[] split = table.split("\\.");
+        schemas = split[0];
+        table   = split[1];
         
         table = table.replaceAll(schemas+".", "");
         
-        Connection conn = PostgreSql.Connection(serviceName, serverType,false,serviceName);
-                
+        Connection conn = PostgreSql.Connection(serviceName, serverType,true);
+        
         try {
         	DEV항목정보 process = new DEV항목정보();
               process.Process(conn,schemas,table,column);
@@ -47,7 +55,7 @@ public class DEV항목정보 {
 //    	System.out.println("컬럼수정\r\n");
     	
     	String query = getColumnsName(schemas,table,column);
-//    	System.out.println(query);
+    	System.out.println(query);
     	List<LinkedHashMap<String,String>> listData = PostgreSql.getSelect(conn,query);
     	
     	for(int index=0;index<listData.size();index++) {
@@ -89,4 +97,6 @@ public class DEV항목정보 {
     	
     	return result.toString();
     }
+    
+    
 }

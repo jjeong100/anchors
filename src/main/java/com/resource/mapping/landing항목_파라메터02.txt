@@ -1,0 +1,29 @@
+'interface'
+                    , now()
+                    , 'interface'
+                    , now()
+                    , CAST(#{rowId} as INTEGER)
+                    , #{item.serviceId}
+                    , to_date(#{item.createDate},'YYYY-MM-DD')
+                    , #{item.serviceCode}
+                    , #{item.specialty}
+                    , #{item.provider}
+                    , #{item.vehicleProblem}
+                    , #{item.problemDescription}
+                    , #{item.tmcPredicted}
+                    , #{item.important}
+                    , #{item.requestStatus}
+                    , #{item.actuationStatus}
+                    , #{item.addressName}
+                    , #{item.addressNumber}
+                    , #{item.addressComplement}
+                    , #{item.county}
+                    , #{item.city}
+                    , #{item.state}
+                    , #{item.latitude}
+                    , #{item.longitude}
+                    , #{item.reference}
+                    , #{item.zipCode}
+                    , #{item.dealerName}
+                    , #{item.dealerNickname}
+                    , #{item.expense}

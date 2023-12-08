@@ -1,0 +1,79 @@
+■ IF013 definition : foundation
+■ IF013 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0012Controller.java
+■ IF013 interfaceMapping    : /api/v1/HMBChannelPartnerGetWebserviceInboundWF
+■ IF013 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0012Mapper.xml
+■ IF013 transferProcess     : null
+■ IF013 transferReplica     : null
+■ IF013 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0012Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0012Mapper">
+    
+    <select id="getChannelPartner" parameterType="IFHMBINNOCEANCDPP0012Dto" resultType="ChannelPartnerDto">
+        select 
+            pca.integrationid as integrationId
+            , pca.corporateregistrationnumber__c as cnpj
+            , pca.name as name
+            , pca.corporaterepresentativename__c as nickname
+            , pca.cust_stat_cd__c as accountStatus
+            , pca.situationstatusreason__c as reasonStatus
+            , pca.dealershoptype__c as dealerType
+            , pca.dealercode__c as dealerCode
+            , pca.phone as mainPhone
+            , pca.fax as fax
+            , pca.emailaddress__c as mainEmailAddress
+            , pca.emailaddress__c as workEmailAddress
+            , case when pca.salesflag__c = true then 'Y' when pca.salesflag__c = false then 'N' end salesDealerFlag
+            , case when pca.serviceflag__c = true then 'Y' when pca.serviceflag__c = false then 'N' end serviceDealerFlag
+            , pca.prtnrshp_start_dt__c as partnerStartDate
+            , pca.prtnrshp_end_dt__c as partnerEndDate
+            , pca.region__c as region
+            , pca.businesshours__c as workingHour
+            , pca.facebook__c as facebookPage
+            , pca.website as homepage
+            , pca.billingstreet as streetAddress
+            , pca.billingstreet_2__c as streetAddress2
+            , pca.billingstreet_3__c as streetAddress3
+            , pca.billingcountry as county
+            , pca.billingcity as city
+            , pca.billingstate as state
+            , pca.billingcountry as neighborhood
+            , pca.billinglatitude as latitude
+            , pca.billinglongitude as longitude
+            , pca.billingpostalcode as zipCode
+            , pca.dealercode__c as csn
+            , pca.row_id as id
+            , pca.row_id as rowId
+        from
+            process.account pca
+        where
+            pca.cust_stat_cd__c = 'Active'
+          and
+            pca."type" = 'Dealer'
+    </select>
+
+    <select id="getChannelPartnerContactList" parameterType="IFHMBINNOCEANCDPP0012Dto" resultType="ChannelPartnerContact">
+        select
+            pcc.integrationid as integrationId
+            , pcc.cpf__c as cpf
+            , pcc.firstname as firstName
+            , pcc.lastname as lastName
+            , pcc.email as emailAddress
+            , pcc.homephone as homePhone
+            , pcc.companyphone__c as workPhone
+            , pcc.mobilephone as cellPhone
+            , pcc.title as jobTitle
+            , pcc.statusdealer__c as status
+            , pcc.note__c  as notes
+            , pcc.row_id as id
+        from
+            process.contact pcc
+        where
+            pcc.account_row_id = #{accountRowId}
+    </select>
+    
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+process.contact
+process.account

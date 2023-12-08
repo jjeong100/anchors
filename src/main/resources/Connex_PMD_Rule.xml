@@ -1,0 +1,2033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ruleset name="Default ruleset used by the CodeClimate Engine for Salesforce.com Apex"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+   <description>Ruleset used for Apex Code in Genesis</description>
+<!-- Rule Set based on discussion 2019-03-20 -->
+
+	<!-- Best Practices start -->
+	<rule ref="category/apex/bestpractices.xml/ApexUnitTestClassShouldHaveAsserts" since="5.5.1"
+          message="Apex unit tests should System.assert() or assertEquals() or assertNotEquals()"
+          class="net.sourceforge.pmd.lang.apex.rule.bestpractices.ApexUnitTestClassShouldHaveAssertsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaveasserts">
+        <description>
+Apex unit tests should include at least one assertion.  This makes the tests more robust, and using assert
+with messages provide the developer a clearer idea of what the test does.
+        </description>
+		<priority>3</priority>
+        <example>
+<![CDATA[
+@isTest
+public class Foo {
+   public static testMethod void testSomething() {
+      Account a = null;
+   // This is better than having a NullPointerException
+   // System.assertNotEquals(a, null, 'account not found');
+   a.toString();
+   }
+}
+]]>
+        </example>
+   </rule>
+
+	<rule name="ApexUnitTestShouldNotUseSeeAllDataTrue"
+          since="5.5.1"
+          message="Apex unit tests should not use @isTest(seeAllData = true)"
+          class="net.sourceforge.pmd.lang.apex.rule.bestpractices.ApexUnitTestShouldNotUseSeeAllDataTrueRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_bestpractices.html#apexunittestshouldnotuseseealldatatrue">
+        <description>
+Apex unit tests should not use @isTest(seeAllData=true) because it opens up the existing database data for unexpected modification by tests.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+@isTest(seeAllData = true)
+public class Foo {
+   public static testMethod void testSomething() {
+      Account a = null;
+   // This is better than having a NullPointerException
+   // System.assertNotEquals(a, null, 'account not found');
+   a.toString();
+   }
+}
+]]>
+        </example>
+    </rule>
+
+	<rule name="AvoidGlobalModifier"
+          since="5.5.0"
+          message="Avoid using global modifier"
+          class="net.sourceforge.pmd.lang.apex.rule.bestpractices.AvoidGlobalModifierRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_bestpractices.html#avoidglobalmodifier">
+        <description>
+Global classes should be avoided (especially in managed packages) as they can never be deleted or changed in signature. Always check twice if something needs to be global.
+Many interfaces (e.g. Batch) required global modifiers in the past but don't require this anymore. Don't lock yourself in.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+global class Unchangeable {
+    global UndeletableType unchangable(UndeletableType param) {
+        // ...
+    }
+}
+]]>
+        </example>
+    </rule>
+	<rule name="AvoidLogicInTrigger"
+          since="5.5.0"
+          message="Avoid logic in triggers"
+          class="net.sourceforge.pmd.lang.apex.rule.bestpractices.AvoidLogicInTriggerRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_bestpractices.html#avoidlogicintrigger">
+        <description>
+As triggers do not allow methods like regular classes they are less flexible and suited to apply good encapsulation style.
+Therefore delegate the triggers work to a regular class (often called Trigger handler class).
+
+See more here: https://developer.salesforce.com/page/Trigger_Frameworks_and_Apex_Trigger_Best_Practices
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+trigger Accounts on Account (before insert, before update, before delete, after insert, after update, after delete, after undelete) {
+    for(Account acc : Trigger.new) {
+        if(Trigger.isInsert) {
+            // ...
+        }
+        // ...
+        if(Trigger.isDelete) {
+            // ...
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+	<!-- Best Practices end -->
+
+	<!-- Code Style start -->
+	<rule name="ClassNamingConventions"
+          since="5.5.0"
+          message="Class names should begin with an uppercase character"
+          class="net.sourceforge.pmd.lang.apex.rule.codestyle.ClassNamingConventionsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#classnamingconventions">
+        <description>
+Class names should always begin with an upper case character.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Foo {}
+]]>
+        </example>
+    </rule>
+
+	<rule name="ForLoopsMustUseBraces"
+          language="apex"
+          since="5.6.0"
+          message="Avoid using 'for' statements without curly braces"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#forloopsmustusebraces">
+        <description>
+Avoid using 'for' statements without using surrounding braces. If the code formatting or
+indentation is lost then it becomes difficult to separate the code being controlled
+from the rest.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ForLoopStatement/BlockStatement[@CurlyBrace='false']
+|
+//ForEachStatement/BlockStatement[@CurlyBrace='false']
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+for (int i = 0; i < 42; i++) // not recommended
+    foo();
+for (int i = 0; i < 42; i++) { // preferred approach
+    foo();
+}
+]]>
+        </example>
+    </rule>
+
+	<rule name="IfElseStmtsMustUseBraces"
+          language="apex"
+          since="5.6.0"
+          message="Avoid using 'if...else' statements without curly braces"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#ifelsestmtsmustusebraces">
+        <description>
+Avoid using if..else statements without using surrounding braces. If the code formatting
+or indentation is lost then it becomes difficult to separate the code being controlled
+from the rest.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfBlockStatement/BlockStatement[@CurlyBrace='false'][count(child::*) > 0]
+|
+//IfElseBlockStatement/BlockStatement[@CurlyBrace='false'][count(child::*) > 0]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// this is OK
+if (foo) x++;
+// but this is not
+if (foo)
+    x = x+1;
+else
+    x = x-1;
+]]>
+        </example>
+    </rule>
+
+	<rule name="IfStmtsMustUseBraces"
+          language="apex"
+          since="5.6.0"
+          message="Avoid using if statements without curly braces"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#ifstmtsmustusebraces">
+        <description>
+Avoid using if statements without using braces to surround the code block. If the code
+formatting or indentation is lost then it becomes difficult to separate the code being
+controlled from the rest.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfBlockStatement/BlockStatement[@CurlyBrace='false']
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+ <![CDATA[
+if (foo)    // not recommended
+    x++;
+if (foo) {  // preferred approach
+    x++;
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="MethodNamingConventions"
+          since="5.5.0"
+          message="Method name does not begin with a lower case character."
+          class="net.sourceforge.pmd.lang.apex.rule.codestyle.MethodNamingConventionsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#methodnamingconventions">
+        <description>
+Method names should always begin with a lower case character, and should not contain underscores.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public void fooStuff() {
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="OneDeclarationPerLine"
+          since="6.7.0"
+          message="Use one statement for each line, it enhances code readability."
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#onedeclarationperline">
+        <description>
+Apex allows the use of several variables declaration of the same type on one line. However, it
+can lead to quite messy code. This rule looks for several declarations on the same line.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//VariableDeclarationStatements
+  [count(VariableDeclaration) > 1]
+  [$strictMode or count(distinct-values(VariableDeclaration/@BeginLine)) != count(VariableDeclaration)]
+|
+//FieldDeclarationStatements
+  [count(FieldDeclaration) > 1]
+  [$strictMode or count(distinct-values(FieldDeclaration/VariableExpression/@BeginLine)) != count(FieldDeclaration/VariableExpression)]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+            <property name="strictMode" type="Boolean" value="false"
+                      description="If true, mark combined declaration even if the declarations are on separate lines."/>
+        </properties>
+        <example>
+<![CDATA[
+Integer a, b;   // not recommended
+Integer a,
+        b;      // ok by default, can be flagged setting the strictMode property
+Integer a;      // preferred approach
+Integer b;
+]]>
+        </example>
+    </rule>
+
+    <rule name="VariableNamingConventions"
+          since="5.5.0"
+          message="{0} variable {1} should begin with {2}"
+          class="net.sourceforge.pmd.lang.apex.rule.codestyle.VariableNamingConventionsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#variablenamingconventions">
+        <description>
+A variable naming conventions rule - customize this to your liking.  Currently, it
+checks for final variables that should be fully capitalized and non-final variables
+that should not include underscores.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public static final Integer MY_NUM = 0;
+    public String myTest = '';
+    DataModule dmTest = new DataModule();
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="WhileLoopsMustUseBraces"
+          language="apex"
+          since="5.6.0"
+          message="Avoid using 'while' statements without curly braces"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_codestyle.html#whileloopsmustusebraces">
+        <description>
+Avoid using 'while' statements without using braces to surround the code block. If the code
+formatting or indentation is lost then it becomes difficult to separate the code being
+controlled from the rest.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//WhileLoopStatement/BlockStatement[@CurlyBrace='false']
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+while (true)    // not recommended
+    x++;
+while (true) {  // preferred approach
+    x++;
+}
+]]>
+        </example>
+    </rule>
+	<!-- Code Style end -->
+
+
+	<!-- Design start -->
+
+	<rule name="AvoidDeeplyNestedIfStmts"
+          since="5.5.0"
+          message="Deeply nested if..then statements are hard to read"
+          class="net.sourceforge.pmd.lang.apex.rule.design.AvoidDeeplyNestedIfStmtsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#avoiddeeplynestedifstmts">
+        <description>
+Avoid creating deeply nested if-then statements since they are harder to read and error-prone to maintain.
+        </description>
+        <priority>2</priority>
+		<properties>
+			<!-- Property has been changed from 3 to 7 based on discussion at 2019.03.20 -->
+			<property name="problemDepth" value="7" />
+		</properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar(Integer x, Integer y, Integer z) {
+        if (x>y) {
+            if (y>z) {
+                if (z==x) {
+                    // !! too deep
+                }
+            }
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="CyclomaticComplexity"
+          message="The {0} ''{1}'' has a{2} cyclomatic complexity of {3}."
+          since="6.0.0"
+          class="net.sourceforge.pmd.lang.apex.rule.design.CyclomaticComplexityRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#cyclomaticcomplexity">
+        <description>
+The complexity of methods directly affects maintenance costs and readability. Concentrating too much decisional logic
+in a single method makes its behaviour hard to read and change.
+
+Cyclomatic complexity assesses the complexity of a method by counting the number of decision points in a method,
+plus one for the method entry. Decision points are places where the control flow jumps to another place in the
+program. As such, they include all control flow statements, such as 'if', 'while', 'for', and 'case'.
+
+Generally, numbers ranging from 1-4 denote low complexity, 5-7 denote moderate complexity, 8-10 denote
+high complexity, and 11+ is very high complexity. By default, this rule reports methods with a complexity >= 10.
+Additionnally, classes with many methods of moderate complexity get reported as well once the total of their
+methods' complexities reaches 40, even if none of the methods was directly reported.
+
+Reported methods should be broken down into several smaller methods. Reported classes should probably be broken down
+into subcomponents.
+        </description>
+        <priority>3</priority>
+		<properties>     
+			<property name="classReportLevel" value="40" />
+			<property name="methodReportLevel" value="10" />
+		</properties>
+        <example>
+<![CDATA[
+public class Complicated {
+  public void example() { // This method has a cyclomatic complexity of 12
+    int x = 0, y = 1, z = 2, t = 2;
+    boolean a = false, b = true, c = false, d = true;
+    if (a && b || b && d) {
+      if (y == z) {
+        x = 2;
+      } else if (y == t && !d) {
+        x = 2;
+      } else {
+        x = 2;
+      }
+    } else if (c && d) {
+      while (z < y) {
+        x = 2;
+      }
+    } else {
+      for (int n = 0; n < t; n++) {
+        x = 2;
+      }
+    }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ExcessiveClassLength"
+          since="5.5.0"
+          message="Avoid really long classes."
+          class="net.sourceforge.pmd.lang.apex.rule.design.ExcessiveClassLengthRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#excessiveclasslength">
+        <description>
+Excessive class file lengths are usually indications that the class may be burdened with excessive 
+responsibilities that could be provided by external classes or functions. In breaking these methods
+apart the code becomes more managable and ripe for reuse.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="1000" />
+		</properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar1() {
+        // 1000 lines of code
+    }
+    public void bar2() {
+        // 1000 lines of code
+    }
+    public void bar3() {
+        // 1000 lines of code
+    }
+    public void barN() {
+        // 1000 lines of code
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ExcessiveParameterList"
+          since="5.5.0"
+          message="Avoid long parameter lists."
+          class="net.sourceforge.pmd.lang.apex.rule.design.ExcessiveParameterListRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#excessiveparameterlist">
+        <description>
+Methods with numerous parameters are a challenge to maintain, especially if most of them share the
+same datatype. These situations usually denote the need for new objects to wrap the numerous parameters.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="4" />
+		</properties>
+        <example>
+<![CDATA[
+// too many arguments liable to be mixed up
+public void addPerson(int birthYear, int birthMonth, int birthDate, int height, int weight, int ssn) {
+    // ...
+}
+// preferred approach 
+public void addPerson(Date birthdate, BodyMeasurements measurements, int ssn) {
+    // ...
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ExcessivePublicCount"
+          since="5.5.0"
+          message="This class has a bunch of public methods and attributes"
+          class="net.sourceforge.pmd.lang.apex.rule.design.ExcessivePublicCountRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#excessivepubliccount">
+        <description>
+Classes with large numbers of public methods and attributes require disproportionate testing efforts
+since combinational side effects grow rapidly and increase risk. Refactoring these classes into
+smaller ones not only increases testability and reliability but also allows new variations to be
+developed easily.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="25" />
+		</properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public String value;
+    public Bar something;
+    public Variable var;
+    // [... more more public attributes ...]
+    public void doWork() {}
+    public void doMoreWork() {}
+    public void doWorkAgain() {}
+    // [... more more public methods ...]
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="NcssConstructorCount"
+          since="5.5.0"
+          message="The constructor has an NCSS line count of {0}"
+          class="net.sourceforge.pmd.lang.apex.rule.design.NcssConstructorCountRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#ncssconstructorcount">
+        <description>
+This rule uses the NCSS (Non-Commenting Source Statements) algorithm to determine the number of lines
+of code for a given constructor. NCSS ignores comments, and counts actual statements. Using this algorithm,
+lines of code that are split are counted as one.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="20" />
+		</properties>
+        <example>
+<![CDATA[
+public class Foo extends Bar {
+    //this constructor only has 1 NCSS lines
+    public Foo() {
+        super();
+        super.foo();
+}
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="NcssMethodCount"
+          since="5.5.0"
+          message="The method ''{0}()'' has an NCSS line count of {1}"
+          class="net.sourceforge.pmd.lang.apex.rule.design.NcssMethodCountRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#ncssmethodcount">
+        <description>
+This rule uses the NCSS (Non-Commenting Source Statements) algorithm to determine the number of lines
+of code for a given method. NCSS ignores comments, and counts actual statements. Using this algorithm,
+lines of code that are split are counted as one.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="60" />
+		</properties>
+        <example>
+<![CDATA[
+public class Foo extends Bar {
+    //this method only has 1 NCSS lines
+    public Integer methd() {
+        super.methd();
+        return 1;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="NcssTypeCount"
+          since="5.5.0"
+          message="The type has an NCSS line count of {0}"
+          class="net.sourceforge.pmd.lang.apex.rule.design.NcssTypeCountRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#ncsstypecount">
+        <description>
+This rule uses the NCSS (Non-Commenting Source Statements) algorithm to determine the number of lines
+of code for a given type. NCSS ignores comments, and counts actual statements. Using this algorithm,
+lines of code that are split are counted as one.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="minimum" value="700" />
+		</properties>
+        <example>
+<![CDATA[
+//this class only has 6 NCSS lines
+public class Foo extends Bar {
+    public Foo() {
+        super();
+        super.foo();
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="StdCyclomaticComplexity"
+          since="5.5.0"
+          message="The {0} ''{1}'' has a Standard Cyclomatic Complexity of {2}."
+          class="net.sourceforge.pmd.lang.apex.rule.design.StdCyclomaticComplexityRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#stdcyclomaticcomplexity">
+        <description>
+Complexity directly affects maintenance costs is determined by the number of decision points in a method 
+plus one for the method entry.  The decision points include 'if', 'while', 'for', and 'case labels' calls.  
+Generally, numbers ranging from 1-4 denote low complexity, 5-7 denote moderate complexity, 8-10 denote
+high complexity, and 11+ is very high complexity.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="reportLevel" value="10" />
+			<property name="showClassesComplexity" value="true" />
+			<property name="showMethodsComplexity" value="true" />
+		</properties>
+        <example>
+<![CDATA[
+// This has a Cyclomatic Complexity = 12
+public class Foo {
+1   public void example() {
+2   if (a == b || (c == d && e == f)) {
+3       if (a1 == b1) {
+            fiddle();
+4       } else if a2 == b2) {
+            fiddle();
+        }  else {
+            fiddle();
+        }
+5   } else if (c == d) {
+6       while (c == d) {
+            fiddle();
+        }
+7   } else if (e == f) {
+8       for (int n = 0; n < h; n++) {
+            fiddle();
+        }
+    } else {
+        switch (z) {
+9           case 1:
+                fiddle();
+                break;
+10          case 2:
+                fiddle();
+                break;
+11          case 3:
+                fiddle();
+                break;
+12          default:
+                fiddle();
+                break;
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="TooManyFields"
+          since="5.5.0"
+          message="Too many fields"
+          class="net.sourceforge.pmd.lang.apex.rule.design.TooManyFieldsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_design.html#toomanyfields">
+        <description>
+Classes that have too many fields can become unwieldy and could be redesigned to have fewer fields,
+possibly through grouping related fields in new objects.  For example, a class with individual 
+city/state/zip fields could park them within a single Address field.
+        </description>
+        <priority>3</priority>
+		<properties>
+			<property name="maxfields" value="20" />
+		</properties>
+        <example>
+<![CDATA[
+public class Person {
+    // too many separate fields
+    int birthYear;
+    int birthMonth;
+    int birthDate;
+    float height;
+    float weight;
+}
+public class Person {
+    // this is more manageable
+    Date birthDate;
+    BodyMeasurements measurements;
+}
+]]>
+        </example>
+    </rule>
+
+	<!-- Design end -->
+
+	<!-- Documentation start -->
+<rule name="ApexDoc"
+          since="6.8.0"
+          message="ApexDoc comment is missing or incorrect"
+          class="net.sourceforge.pmd.lang.apex.rule.documentation.ApexDocRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_documentation.html#apexdoc">
+        <description>
+This rule validates that:
+
+* ApexDoc comments are present for classes, methods, and properties that are public or global, excluding
+overrides and test classes (as well as the contents of test classes).
+* ApexDoc comments should contain @description.
+* ApexDoc comments on non-void, non-constructor methods should contain @return.
+* ApexDoc comments on void or constructor methods should not contain @return.
+* ApexDoc comments on methods with parameters should contain @param for each parameter, in the same
+order as the method signature.
+
+Method overrides and tests are both exempted from having ApexDoc.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+/**
+ * @description Hello World
+ */
+public class HelloWorld {
+    /**
+     * @description Bar
+     * @return Bar
+     */
+    public Object bar() { return null; }
+}
+]]>
+        </example>
+    </rule>
+	<!-- Documentation end -->
+
+	<!-- Error Prone start -->
+
+<rule name="AvoidDirectAccessTriggerMap"
+          since="6.0.0"
+          message="Avoid directly accessing Trigger.old and Trigger.new"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#avoiddirectaccesstriggermap">
+        <description>
+Avoid directly accessing Trigger.old and Trigger.new as it can lead to a bug. Triggers should be bulkified and iterate through the map to handle the actions for each item separately.
+        </description>
+        <priority>3</priority>
+            <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ArrayLoadExpression[TriggerVariableExpression and LiteralExpression]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+trigger AccountTrigger on Account (before insert, before update) {
+   Account a = Trigger.new[0]; //Bad: Accessing the trigger array directly is not recommended.
+   
+   foreach ( Account a : Trigger.new ){   
+        //Good: Iterate through the trigger.new array instead.
+   }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="AvoidHardcodingId"
+          since="6.0.0"
+          message="Hardcoding Id's is bound to break when changing environments."
+          class="net.sourceforge.pmd.lang.apex.rule.errorprone.AvoidHardcodingIdRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#avoidhardcodingid">
+        <description>
+When deploying Apex code between sandbox and production environments, or installing Force.com AppExchange packages,
+it is essential to avoid hardcoding IDs in the Apex code. By doing so, if the record IDs change between environments,
+the logic can dynamically identify the proper data to operate against and not fail.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    void foo() {
+        //Error - hardcoded the record type id
+        if(a.RecordTypeId == '012500000009WAr'){
+            //do some logic here.....
+        } else if(a.RecordTypeId == '0123000000095Km'){
+            //do some logic here for a different record type...
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="AvoidNonExistentAnnotations"
+          since="6.5.0"
+          message="Use of non existent annotations will lead to broken Apex code which will not compile in the future."
+          class="net.sourceforge.pmd.lang.apex.rule.errorprone.AvoidNonExistentAnnotationsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#avoidnonexistentannotations">
+        <description>
+            Apex supported non existent annotations for legacy reasons.
+            In the future, use of such non-existent annotations could result in broken apex code that will not compile.
+            This will prevent users of garbage annotations from being able to use legitimate annotations added to Apex in the future.
+            A full list of supported annotations can be found at https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_annotation.htm
+        </description>
+        <priority>3</priority>
+        <example>
+            <![CDATA[@NonExistentAnnotation public class ClassWithNonexistentAnnotation {
+	@NonExistentAnnotation public void methodWithNonExistentAnnotation() {
+		// ...
+	}
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="EmptyCatchBlock"
+          language="apex"
+          since="6.0.0"
+          message="Avoid empty catch blocks"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#emptycatchblock">
+        <description>
+Empty Catch Block finds instances where an exception is caught, but nothing is done.  
+In most circumstances, this swallows an exception which should either be acted on 
+or reported.
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//CatchBlockStatement[./BlockStatement[count(*) = 0]]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public void doSomething() {
+  ...
+  try {
+    insert accounts;
+  } catch (DmlException dmle) {
+    // not good
+  }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="EmptyIfStmt"
+          language="apex"
+          since="6.0.0"
+          message="Avoid empty 'if' statements"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#emptyifstmt">
+        <description>
+Empty If Statement finds instances where a condition is checked but nothing is done about it.
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfBlockStatement
+ [BlockStatement[count(*) = 0]]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+  public void bar(Integer x) {
+    if (x == 0) {
+      // empty!
+    }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="EmptyStatementBlock"
+          language="apex"
+          since="6.0.0"
+          message="Avoid empty block statements."
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#emptystatementblock">
+        <description>
+Empty block statements serve no purpose and should be removed.
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Method/ModifierNode[@Abstract!='true' and ../BlockStatement[count(*) = 0]]
+| //Method/BlockStatement//BlockStatement[count(*) = 0 and @Location != parent::*/@Location]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+   private int _bar;
+   public void setBar(int bar) {
+        // empty
+   }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="EmptyTryOrFinallyBlock"
+          language="apex"
+          since="6.0.0"
+          message="Avoid empty try or finally blocks"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#emptytryorfinallyblock">
+        <description>
+Avoid empty try or finally blocks - what's the point?
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//TryCatchFinallyBlockStatement[./BlockStatement[count(*) = 0]]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar() {
+        try {
+          // empty !
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+public class Foo {
+    public void bar() {
+        try {
+            int x=2;
+        } finally {
+            // empty!
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="EmptyWhileStmt"
+          language="apex"
+          since="6.0.0"
+          message="Avoid empty 'while' statements"
+          class="net.sourceforge.pmd.lang.apex.rule.ApexXPathRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#emptywhilestmt">
+        <description>
+Empty While Statement finds all instances where a while statement does nothing.  
+If it is a timing loop, then you should use Thread.sleep() for it; if it is
+a while loop that does a lot in the exit expression, rewrite it to make it clearer.
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//WhileLoopStatement[./BlockStatement[count(*) = 0]]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public void bar(Integer a, Integer b) {
+  while (a == b) {
+    // empty!
+  }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="MethodWithSameNameAsEnclosingClass"
+          since="5.5.0"
+          message="Classes should not have non-constructor methods with the same name as the class"
+          class="net.sourceforge.pmd.lang.apex.rule.errorprone.MethodWithSameNameAsEnclosingClassRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_errorprone.html#methodwithsamenameasenclosingclass">
+        <description>
+Non-constructor methods should not have the same name as the enclosing class.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public class MyClass {
+    // this is OK because it is a constructor
+    public MyClass() {}
+    // this is bad because it is a method
+    public void MyClass() {}
+}
+]]>
+        </example>
+    </rule>
+
+	<!-- Error Prone end -->
+
+	<!-- Performance start -->
+
+	<rule name="AvoidDmlStatementsInLoops"
+          since="5.5.0"
+          message="Avoid DML statements inside loops"
+          class="net.sourceforge.pmd.lang.apex.rule.performance.AvoidDmlStatementsInLoopsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_performance.html#avoiddmlstatementsinloops">
+        <description>
+Avoid DML statements inside loops to avoid hitting the DML governor limit. Instead, try to batch up the data into a list and invoke your DML once on that list of data outside the loop.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Something {
+    public void foo() {  
+        for (Integer i = 0; i < 151; i++) {
+            Account account;
+            // ...
+            insert account;
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="AvoidSoqlInLoops"
+          since="5.5.0"
+          message="Avoid Soql queries inside loops"
+          class="net.sourceforge.pmd.lang.apex.rule.performance.AvoidSoqlInLoopsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_performance.html#avoidsoqlinloops">
+        <description>
+New objects created within loops should be checked to see if they can created outside them and reused.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Something {
+    public static void main( String as[] ) {
+        for (Integer i = 0; i < 10; i++) {
+            List<Account> accounts = [SELECT Id FROM Account];
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="AvoidSoslInLoops"
+          since="6.0.0"
+          message="Avoid Sosl queries inside loops"
+          class="net.sourceforge.pmd.lang.apex.rule.performance.AvoidSoslInLoopsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_performance.html#avoidsoslinloops">
+        <description>
+Sosl calls within loops can cause governor limit exceptions.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Something {
+    public static void main( String as[] ) {
+        for (Integer i = 0; i < 10; i++) {
+            List<List<SObject>> searchList = [FIND 'map*' IN ALL FIELDS RETURNING Account (Id, Name), Contact, Opportunity, Lead];
+        }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+	<!-- Performance end -->
+
+	<!-- Security start -->
+
+	<rule name="ApexBadCrypto"
+          since="5.5.3"
+          message="Apex classes should use random IV/key"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexBadCryptoRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexbadcrypto">
+        <description>
+The rule makes sure you are using randomly generated IVs and keys for `Crypto` calls.
+Hard-wiring these values greatly compromises the security of encrypted data.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    Blob hardCodedIV = Blob.valueOf('Hardcoded IV 123');
+    Blob hardCodedKey = Blob.valueOf('0000000000000000');
+    Blob data = Blob.valueOf('Data to be encrypted');
+    Blob encrypted = Crypto.encrypt('AES128', hardCodedKey, hardCodedIV, data);
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexCRUDViolation"
+          since="5.5.3"
+          message="Validate CRUD permission before SOQL/DML operation"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexCRUDViolationRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexcrudviolation">
+        <description>
+The rule validates you are checking for access permissions before a SOQL/SOSL/DML operation.
+Since Apex runs in system mode not having proper permissions checks results in escalation of 
+privilege and may produce runtime errors. This check forces you to handle such scenarios.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public Contact foo(String status, String ID) {
+        Contact c = [SELECT Status__c FROM Contact WHERE Id=:ID];
+        // Make sure we can update the database before even trying
+        if (!Schema.sObjectType.Contact.fields.Name.isUpdateable()) {
+            return null;
+        }
+        c.Status__c = status;
+        update c;
+        return c;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexCSRF"
+          since="5.5.3"
+          message="Avoid making DML operations in Apex class constructor/init method"
+          class="net.sourceforge.pmd.lang.apex.rule.errorprone.ApexCSRFRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexcsrf">
+        <description>
+Check to avoid making DML operations in Apex class constructor/init method. This prevents
+modification of the database just by accessing a page.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public init() {
+        insert data;
+    }
+    public Foo() {
+        insert data;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexDangerousMethods"
+          since="5.5.3"
+          message="Calling potentially dangerous method"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexDangerousMethodsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexdangerousmethods">
+        <description>
+Checks against calling dangerous methods.
+
+For the time being, it reports:
+
+* Against `FinancialForce`'s `Configuration.disableTriggerCRUDSecurity()`. Disabling CRUD security
+opens the door to several attacks and requires manual validation, which is unreliable.
+* Calling `System.debug` passing sensitive data as parameter, which could lead to exposure
+of private data.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public Foo() {
+        Configuration.disableTriggerCRUDSecurity();
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexInsecureEndpoint"
+          since="5.5.3"
+          message="Apex callouts should use encrypted communication channels"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexInsecureEndpointRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexinsecureendpoint">
+        <description>
+Checks against accessing endpoints under plain **http**. You should always use
+**https** for security.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    void foo() {
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('http://localhost:com');
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexOpenRedirect"
+          since="5.5.3"
+          message="Apex classes should safely redirect to a known location"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexOpenRedirectRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexopenredirect">
+        <description>
+Checks against redirects to user-controlled locations. This prevents attackers from
+redirecting users to phishing sites.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    String unsafeLocation = ApexPage.getCurrentPage().getParameters.get('url_param');
+    PageReference page() {
+       return new PageReference(unsafeLocation);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexSharingViolations"
+          since="5.5.3"
+          message="Apex classes should declare a sharing model if DML or SOQL/SOSL is used"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexSharingViolationsRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexsharingviolations">
+        <description>
+Detect classes declared without explicit sharing mode if DML methods are used. This
+forces the developer to take access restrictions into account before modifying objects.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    // DML operation here
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexSOQLInjection"
+          since="5.5.3"
+          message="Avoid untrusted/unescaped variables in DML query"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexSOQLInjectionRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexsoqlinjection">
+        <description>
+Detects the usage of untrusted / unescaped variables in DML queries.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public void test1(String t1) {
+        Database.query('SELECT Id FROM Account' + t1);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexSuggestUsingNamedCred"
+          since="5.5.3"
+          message="Suggest named credentials for authentication"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexSuggestUsingNamedCredRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexsuggestusingnamedcred">
+        <description>
+Detects hardcoded credentials used in requests to an endpoint.
+
+You should refrain from hardcoding credentials:
+  * They are hard to mantain by being mixed in application code
+  * Particularly hard to update them when used from different classes
+  * Granting a developer access to the codebase means granting knowledge
+     of credentials, keeping a two-level access is not possible.
+  * Using different credentials for different environments is troublesome
+     and error-prone.
+
+Instead, you should use *Named Credentials* and a callout endpoint.
+
+For more information, you can check [this](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_callouts_named_credentials.htm)
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public void foo(String username, String password) {
+        Blob headerValue = Blob.valueOf(username + ':' + password);
+        String authorizationHeader = 'BASIC ' + EncodingUtil.base64Encode(headerValue);
+        req.setHeader('Authorization', authorizationHeader);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexXSSFromEscapeFalse"
+          since="5.5.3"
+          message="Apex classes should escape Strings in error messages"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexXSSFromEscapeFalseRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexxssfromescapefalse">
+        <description>
+Reports on calls to `addError` with disabled escaping. The message passed to `addError`
+will be displayed directly to the user in the UI, making it prime ground for XSS
+attacks if unescaped.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    Trigger.new[0].addError(vulnerableHTMLGoesHere, false);
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ApexXSSFromURLParam"
+          since="5.5.3"
+          message="Apex classes should escape/sanitize Strings obtained from URL parameters"
+          class="net.sourceforge.pmd.lang.apex.rule.security.ApexXSSFromURLParamRule"
+          externalInfoUrl="https://pmd.github.io/pmd/pmd_rules_apex_security.html#apexxssfromurlparam">
+        <description>
+Makes sure that all values obtained from URL parameters are properly escaped / sanitized
+to avoid XSS attacks.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public without sharing class Foo {
+    String unescapedstring = ApexPage.getCurrentPage().getParameters.get('url_param');
+    String usedLater = unescapedstring;
+}
+]]>
+        </example>
+    </rule>
+
+	<!-- Security end -->
+
+
+	<!-- Visualfoce Start -->
+	<rule name="VfCsrf"
+          since="5.6.0"
+          message="Avoid calling VF action upon page load"
+          class="net.sourceforge.pmd.lang.vf.rule.security.VfCsrfRule"
+          ref="category/vf/security.xml/VfCsrf"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_vf_security.html#vfcsrf">
+        <description>
+Avoid calling VF action upon page load as the action becomes vulnerable to CSRF.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+<apex:page controller="AcRestActionsController" action="{!csrfInitMethod}" >
+]]>
+        </example>
+    </rule>
+	<rule name="VfUnescapeEl"
+          since="5.6.0"
+          message="Avoid unescaped user controlled content in EL"
+          class="net.sourceforge.pmd.lang.vf.rule.security.VfUnescapeElRule"
+          ref="category/vf/security.xml/VfUnescapeEl"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_vf_security.html#vfunescapeel">
+        <description>
+Avoid unescaped user controlled content in EL as it results in XSS.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+<apex:outputText value="Potential XSS is {! here }" escape="false" />
+]]>
+        </example>
+    </rule>
+
+	<!-- Visualfoce End -->
+
+
+	<!-- Lightning Start -->
+	<rule name="AvoidWithStatement"
+          message="Avoid using with - it's bad news"
+          language="ecmascript"
+          since="5.0.1"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+		  ref="category/ecmascript/bestpractices.xml/AvoidWithStatement"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_bestpractices.html#avoidwithstatement">
+        <description>Avoid using with - it's bad news</description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//WithStatement
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+with (object) {
+    property = 3; // Might be on object, might be on window: who knows.
+}
+]]>
+        </example>
+    </rule>
+	<rule name="ConsistentReturn"
+          since="5.0"
+          message="A function should not mix 'return' statements with and without a result."
+          class="net.sourceforge.pmd.lang.ecmascript.rule.bestpractices.ConsistentReturnRule"
+		  ref="category/ecmascript/bestpractices.xml/ConsistentReturn"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_bestpractices.html#consistentreturn">
+        <description>
+ECMAScript does provide for return types on functions, and therefore there is no solid rule as to their usage.
+However, when a function does use returns they should all have a value, or all with no value.  Mixed return
+usage is likely a bug, or at best poor style.
+        </description>
+        <priority>2</priority>
+        <example>
+<![CDATA[
+// Ok
+function foo() {
+    if (condition1) {
+        return true;
+    }
+    return false;
+}
+// Bad
+function bar() {
+    if (condition1) {
+        return;
+    }
+    return false;
+}
+]]>
+        </example>
+    </rule>
+	
+	<rule name="GlobalVariable"
+          message="Avoid using global variables"
+          language="ecmascript"
+          since="5.0"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+		  ref="category/ecmascript/bestpractices.xml/GlobalVariable"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_bestpractices.html#globalvariable">
+        <description>
+This rule helps to avoid using accidently global variables by simply missing the "var" declaration.
+Global variables can lead to side-effects that are hard to debug.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Assignment[Name/@GlobalName = true()]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+function(arg) {
+    notDeclaredVariable = 1;    // this will create a global variable and trigger the rule
+    var someVar = 1;            // this is a local variable, that's ok
+    window.otherGlobal = 2;     // this will not trigger the rule, although it is a global variable.
+}
+]]>
+        </example>
+    </rule>
+	
+	<rule name="ScopeForInVariable"
+          language="ecmascript"
+          since="5.0"
+          message="The for-in loop variable ''{0}'' should be explicitly scoped with 'var' to avoid pollution."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+		  ref="category/ecmascript/bestpractices.xml/ScopeForInVariable"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_bestpractices.html#scopeforinvariable">
+        <description>
+A for-in loop in which the variable name is not explicitly scoped to the enclosing scope with the 'var' keyword can
+refer to a variable in an enclosing scope outside the nearest enclosing scope.  This will overwrite the
+existing value of the variable in the outer scope when the body of the for-in is evaluated.  When the for-in loop
+has finished, the variable will contain the last value used in the for-in, and the original value from before
+the for-in loop will be gone.  Since the for-in variable name is most likely intended to be a temporary name, it
+is better to explicitly scope the variable name to the nearest enclosing scope with 'var'.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ForInLoop[not(child::VariableDeclaration)]/Name[1]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+function foo() {
+    var p = 'clean';
+    function() {
+        var obj = { dirty: 'dirty' };
+        for (var p in obj) { // Use 'var' here.
+            obj[p] = obj[p];
+        }
+        return x;
+    }();
+    // 'p' still has value of 'clean'.
+}
+// Bad
+function bar() {
+    var p = 'clean';
+    function() {
+        var obj = { dirty: 'dirty' };
+        for (p in obj) { // Oh no, missing 'var' here!
+            obj[p] = obj[p];
+        }
+        return x;
+    }();
+    // 'p' is trashed and has value of 'dirty'!
+}
+]]>
+        </example>
+    </rule>
+	<rule name="UseBaseWithParseInt"
+          message="Always provide a base when using parseInt() functions"
+          language="ecmascript"
+          since="5.0.1"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+		  ref="category/ecmascript/bestpractices.xml/UseBaseWithParseInt"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_bestpractices.html#usebasewithparseint">
+        <description>
+This rule checks for usages of parseInt. While the second parameter is optional and usually defaults
+to 10 (base/radix is 10 for a decimal number), different implementations may behave differently.
+It also improves readability, if the base is given.
+
+See also: [parseInt()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt)
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//FunctionCall/Name[
+     @Image = 'parseInt'
+     and
+     count(../*) < 3
+]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+parseInt("010");    // unclear, could be interpreted as 10 or 7 (with a base of 7)
+parseInt("10", 10); // good
+]]>
+        </example>
+    </rule>
+	<rule name="AssignmentInOperand"
+          language="ecmascript"
+          since="5.0"
+          message="Avoid assignments in operands"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+		  ref="category/ecmascript/codestyle.xml/AssignmentInOperand"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#assignmentinoperand">
+        <description>
+Avoid assignments in operands; this can make code more complicated and harder to read.  This is sometime
+indicative of the bug where the assignment operator '=' was used instead of the equality operator '=='.
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+    //IfStatement[$allowIf = false()]/child::node()[1]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+|
+    //WhileLoop[$allowWhile = false()]/child::node()[1]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+|
+    //DoLoop[$allowWhile = false()]/child::node()[2]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+|
+    //ForLoop[$allowFor = false()]/child::node()[2]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+|
+   //ConditionalExpression[$allowTernary = false()]/child::node()[1]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+|
+   //ConditionalExpression[$allowTernaryResults = false()]/child::node()[position() = 2 or position() = 3]/descendant-or-self::node()[self::Assignment or self::UnaryExpression[$allowIncrementDecrement = false() and (@Image = "--" or @Image = "++")]]
+]]>
+                </value>
+            </property>
+            <property name="allowIf" type="Boolean" value="false" description="Allow assignment within the conditional expression of an if statement" />
+            <property name="allowFor" type="Boolean" value="false" description="Allow assignment within the conditional expression of a for statement" />
+            <property name="allowWhile" type="Boolean" value="false" description="Allow assignment within the conditional expression of a while statement" />
+            <property name="allowTernary" type="Boolean" value="false" description="Allow assignment within the conditional expression of a ternary operator" />
+            <property name="allowTernaryResults" type="Boolean" value="false" description="Allow assignment within the result expressions of a ternary operator" />
+            <property name="allowIncrementDecrement" type="Boolean" value="false" description="Allow increment or decrement operators within the conditional expression of an if, for, or while statement" />
+        </properties>
+        <example>
+<![CDATA[
+var x = 2;
+// Bad
+if ((x = getX()) == 3) {
+    alert('3!');
+}
+function getX() {
+    return 3;
+}
+]]>
+        </example>
+    </rule>
+	<rule name="ForLoopsMustUseBraces"
+          language="ecmascript"
+          since="5.0"
+          message="Avoid using 'for' statements without curly braces"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/ForLoopsMustUseBraces"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#forloopsmustusebraces">
+        <description>
+Avoid using 'for' statements without using curly braces.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ForLoop[not(child::Scope)]
+|
+//ForInLoop[not(child::Scope)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+for (var i = 0; i < 42; i++) {
+    foo();
+}
+// Bad
+for (var i = 0; i < 42; i++)
+    foo();
+]]>
+        </example>
+    </rule>
+	<rule name="IfElseStmtsMustUseBraces"
+          language="ecmascript"
+          since="5.0"
+          message="Avoid using 'if...else' statements without curly braces"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/IfElseStmtsMustUseBraces"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#ifelsestmtsmustusebraces">
+        <description>
+Avoid using if..else statements without using curly braces.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ExpressionStatement[parent::IfStatement[@Else = true()]]
+   [not(child::Scope)]
+   [not(child::IfStatement)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+if (foo) {
+    x++;
+} else {
+    y++;
+}
+// Bad
+if (foo)
+    x++;
+else
+    y++;
+]]>
+        </example>
+    </rule>
+	<rule name="IfStmtsMustUseBraces"
+          language="ecmascript"
+          since="5.0"
+          message="Avoid using if statements without curly braces"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/IfStmtsMustUseBraces"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#ifstmtsmustusebraces">
+        <description>
+Avoid using if statements without using curly braces.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfStatement[@Else = false() and not(child::Scope)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+if (foo) {
+    x++;
+}
+// Bad
+if (foo)
+    x++;
+]]>
+        </example>
+    </rule>
+	<rule name="NoElseReturn"
+          language="ecmascript"
+          since="5.5.0"
+          message="The else block is unnecessary"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/NoElseReturn"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#noelsereturn">
+        <description>
+The else block in a if-else-construct is unnecessary if the `if` block contains a return.
+Then the content of the else block can be put outside.
+
+See also: &lt;http://eslint.org/docs/rules/no-else-return>
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfStatement[@Else=true()][Scope[1]/ReturnStatement]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Bad:
+if (x) {
+    return y;
+} else {
+    return z;
+}
+// Good:
+if (x) {
+    return y;
+}
+return z;
+]]>
+        </example>
+    </rule>
+	<rule name="UnnecessaryBlock"
+          language="ecmascript"
+          since="5.0"
+          message="Unnecessary block."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/UnnecessaryBlock"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#unnecessaryblock">
+        <description>
+An unnecessary Block is present.  Such Blocks are often used in other languages to
+introduce a new variable scope.  Blocks do not behave like this in ECMAScipt, and using them can
+be misleading.  Considering removing this unnecessary Block.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Block[not(parent::FunctionNode or parent::IfStatement or parent::ForLoop or parent::ForInLoop
+    or parent::WhileLoop or parent::DoLoop or parent::TryStatement or parent::CatchClause)]
+|
+//Scope[not(parent::FunctionNode or parent::IfStatement or parent::ForLoop or parent::ForInLoop
+    or parent::WhileLoop or parent::DoLoop or parent::TryStatement or parent::CatchClause)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+if (foo) {
+    // Ok
+}
+if (bar) {
+    {
+        // Bad
+    }
+}
+]]>
+        </example>
+    </rule>
+	<rule name="UnnecessaryParentheses"
+          language="ecmascript"
+          since="5.0"
+          message="Unnecessary parentheses."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/UnnecessaryParentheses"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#unnecessaryparentheses">
+        <description>Unnecessary parentheses should be removed.</description>
+        <priority>4</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ParenthesizedExpression/ParenthesizedExpression
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+var x = 1; // Ok
+var y = (1 + 1); // Ok
+var z = ((1 + 1)); // Bad
+]]>
+        </example>
+    </rule>
+	<rule name="UnreachableCode"
+          language="ecmascript"
+          since="5.0"
+          message="A ''return'', ''break'', ''continue'', or ''throw'' statement should be the last in a block."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/UnreachableCode"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#unreachablecode">
+        <description>
+A 'return', 'break', 'continue', or 'throw' statement should be the last in a block. Statements after these
+will never execute.  This is a bug, or extremely poor style.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+    //ReturnStatement[following-sibling::node()]
+|
+    //ContinueStatement[following-sibling::node()]
+|
+    //BreakStatement[following-sibling::node()]
+|
+    //ThrowStatement[following-sibling::node()]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+function foo() {
+   return 1;
+}
+// Bad
+function bar() {
+   var x = 1;
+   return x;
+   x = 2;
+}
+]]>
+        </example>
+    </rule>
+	<rule name="WhileLoopsMustUseBraces"
+          language="ecmascript"
+          since="5.0"
+          message="Avoid using 'while' statements without curly braces"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/codestyle.xml/WhileLoopsMustUseBraces"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_codestyle.html#whileloopsmustusebraces">
+        <description>
+Avoid using 'while' statements without using curly braces.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//WhileLoop[not(child::Scope)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+while (true) {
+    x++;
+}
+// Bad
+while (true)
+    x++;
+]]>
+        </example>
+    </rule>
+	<rule name="AvoidTrailingComma"
+          message="Avoid trailing commas in object or array literals"
+          language="ecmascript"
+          since="5.1"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/errorprone.xml/AvoidTrailingComma"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_errorprone.html#avoidtrailingcomma">
+        <description>
+This rule helps improve code portability due to differences in browser treatment of trailing commas in object or array literals.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ObjectLiteral[$allowObjectLiteral = false() and @TrailingComma = true()]
+|
+//ArrayLiteral[$allowArrayLiteral = false() and @TrailingComma = true()]
+]]>
+                </value>
+            </property>
+            <property name="allowObjectLiteral" type="Boolean" value="false" description="Allow a trailing comma within an object literal" />
+            <property name="allowArrayLiteral" type="Boolean" value="false" description="Allow a trailing comma within an array literal" />
+        </properties>
+        <example>
+<![CDATA[
+function(arg) {
+    var obj1 = { a : 1 };   // Ok
+    var arr1 = [ 1, 2 ];    // Ok
+    var obj2 = { a : 1, };  // Syntax error in some browsers!
+    var arr2 = [ 1, 2, ];   // Length 2 or 3 depending on the browser!
+}
+]]>
+        </example>
+    </rule>
+	<rule name="EqualComparison"
+          language="ecmascript"
+          since="5.0"
+          message="Use '==='/'!==' to compare with true/false or Numbers"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          ref="category/ecmascript/errorprone.xml/EqualComparison"
+		  externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_errorprone.html#equalcomparison">
+        <description>
+Using == in condition may lead to unexpected results, as the variables are automatically casted to be of the
+same type. The === operator avoids the casting.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//InfixExpression[
+  (@Image = "==" or @Image = "!=")
+  and
+  (KeywordLiteral[@Image='true' or @Image = 'false'] or NumberLiteral)
+]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+// Ok
+if (someVar === true) {
+  ...
+}
+// Ok
+if (someVar !== 3) {
+  ...
+}
+// Bad
+if (someVar == true) {
+  ...
+}
+// Bad
+if (someVar != 3) {
+  ...
+}
+]]>
+        </example>
+    </rule>
+
+	<!-- 15byte 보다 작은 숫자에 대해서도 위배로 판단함. pmd bug fix 되면 적용 고려.-->
+	<rule name="InnaccurateNumericLiteral"
+          language="ecmascript"
+          since="5.0"
+          message="The numeric literal ''{0}'' will have at different value at runtime."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          externalInfoUrl="https://pmd.github.io/latest/pmd_rules_ecmascript_errorprone.html#innaccuratenumericliteral">
+        <description>
+The numeric literal will have a different value at runtime, which can happen if you provide too much
+precision in a floating point number.  This may result in numeric calculations being in error.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//NumberLiteral[@NormalizedImage != string(@Number)]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+var a = 9; // Ok
+var b = 999999999999999; // Ok
+var c = 999999999999999999999; // Not good
+var w = 1.12e-4; // Ok
+var x = 1.12; // Ok
+var y = 1.1234567890123; // Ok
+var z = 1.12345678901234567; // Not good
+]]>
+        </example>
+    </rule>
+
+	<!-- Lightning End -->
+
+</ruleset>
+

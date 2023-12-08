@@ -21,11 +21,11 @@ public class 최신스택로그 {
 //        String serverType  = "dev";
         
 //        
-        String serviceName = "prod_prod";//
+        String serviceName = "prod";//
         String serverType  = "server";
         
         
-        Connection conn = PostgreSql.Connection(serviceName, serverType,false,serviceName);
+        Connection conn = PostgreSql.Connection(serviceName, serverType,true);
                 
         try {
         	최신스택로그 process = new 최신스택로그();

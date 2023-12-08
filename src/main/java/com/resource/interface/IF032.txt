@@ -1,0 +1,202 @@
+■ IF032 definition : foundation
+■ IF032 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0027Controller.java
+■ IF032 interfaceMapping    : /api/v1/HMBRegisterInApplicationWS
+■ IF032 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0027Mapper.xml
+■ IF032 transferProcess     : process.if_register_in_app_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF032 transferReplica     : replica.if_register_in_app_ws(#{ACCOUNT_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN})
+■ IF032 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0027Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0027Mapper">
+    
+    <select id="getParRowCheck" parameterType="IFHMBINNOCEANCDPP0027Dto" resultType="Integer">
+        select
+            count(*)
+        from
+            process.loyalty_program         
+        where
+            person_account_id = #{contactId}
+    </select>
+    
+    <insert id="insertObject" parameterType="IFHMBINNOCEANCDPP0027Dto"  useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_register_in_app_ws
+        (
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , contactid
+            , appsource
+            , appstatus
+        )
+        values
+        (
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{contactId}
+            , #{appSource}
+            , #{appStatus}
+        );
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_register_in_app_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_register_in_app_ws(#{ACCOUNT_ID,jdbcType=VARCHAR,mode=IN}, #{checkcu,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <select id="getObject" parameterType="IFHMBINNOCEANCDPP0027Dto" resultType="String"> 
+        select             
+            loyaltystatus__c as loyaltyStatus
+        from 
+            process.account
+        where
+            row_id = #{contactId}
+    </select>
+    
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	begin
+		
+		if checkcu = 'insert' then
+			-- insert 'loyalty_program'
+			insert into process.loyalty_program 
+			(
+				person_account_id
+				, x_src_app__c
+			)
+			select
+				contactid
+				, appsource
+			from
+				landing.if_register_in_app_ws riaw 
+			where				
+				riaw.row_id = cast(param_id as INTEGER);
+			
+			-- update 'account'
+			update process.account as pa set 
+				loyaltystatus__c = case when lr.appstatus isnull then pa.loyaltystatus__c when lr.appstatus = '' then pa.loyaltystatus__c else lr.appstatus end
+			from
+				landing.if_register_in_app_ws lr
+			where
+				lr.row_id = cast(param_id as INTEGER)			
+			and
+				pa.row_id = lr.contactid;
+			
+			-- update 'contact'
+			update process.contact as pc set 
+				loyaltystatus__c = case when lr.appstatus isnull then pc.loyaltystatus__c when lr.appstatus = '' then pc.loyaltystatus__c else lr.appstatus end 
+			from
+				landing.if_register_in_app_ws lr
+			where
+				lr.row_id = cast(param_id as INTEGER)
+			and 
+				pc.account_row_id = lr.contactid;
+			
+		end if;
+	
+		if checkcu = 'update' then
+			update process.loyalty_program as plp set 
+				x_src_app__c = case when riaw.appsource isnull then plp.x_src_app__c when x_src_app__c = '' then plp.x_src_app__c else riaw.appsource end 
+			from
+				landing.if_register_in_app_ws riaw 
+			where 
+				plp.person_account_id = riaw.contactid 
+			and
+				riaw.row_id = cast(param_id as INTEGER);
+			
+			-- update 'account'
+			update process.account as pa set 
+				loyaltystatus__c = case when lr.appstatus isnull then pa.loyaltystatus__c when lr.appstatus = '' then pa.loyaltystatus__c else lr.appstatus end
+			from
+				landing.if_register_in_app_ws lr
+			where
+				lr.row_id = cast(param_id as INTEGER)			
+			and
+				pa.row_id = lr.contactid;
+			
+			-- update 'contact'
+			update process.contact as pc set 
+				loyaltystatus__c = case when lr.appstatus isnull then pc.loyaltystatus__c when lr.appstatus = '' then pc.loyaltystatus__c else lr.appstatus end 
+			from
+				landing.if_register_in_app_ws lr
+			where
+				lr.row_id = cast(param_id as INTEGER)
+			and 
+				pc.account_row_id = lr.contactid;
+		end if;
+	
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	BEGIN
+
+		if checkcu = 'insert' then
+			insert into "replica".loyaltyprogram__c
+			(
+				personaccountid__r__external_id__c
+				, x_src_app__c
+				, external_id__c 
+				, "name" 
+			)
+			select
+				plp.person_account_id 
+				, plp.x_src_app__c 
+				, plp.row_id
+				, plp.person_account_id || ' ' || plp.x_src_app__c  
+			from
+				process.loyalty_program plp
+			where				
+				plp.person_account_id = account_id;
+			
+			
+			
+			update "replica".account as ra set 
+				loyaltystatus__c = case when pa.loyaltystatus__c isnull then ra.loyaltystatus__c else pa.loyaltystatus__c end
+			from
+				process.account pa
+			where
+				pa.row_id = account_id
+			and
+				ra.external_id__c = account_id;
+			
+
+		end if;
+	
+		if checkcu = 'update' then
+			update "replica".loyaltyprogram__c as rlp set 
+				x_src_app__c = case when plp.x_src_app__c isnull then plp.x_src_app__c else plp.x_src_app__c end 
+			from
+				process.loyalty_program plp
+			where 
+				plp.person_account_id = account_id
+			and
+				rlp.personaccountid__r__external_id__c = account_id;
+			
+			
+			update "replica".account as ra set 
+				loyaltystatus__c = case when pa.loyaltystatus__c isnull then ra.loyaltystatus__c else pa.loyaltystatus__c end
+			from
+				process.account pa
+			where
+				pa.row_id = account_id
+			and
+				ra.external_id__c = account_id;
+		end if;
+	
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_register_in_app_ws
+process.contact
+process.account
+process.loyalty_program
+"replica".loyaltyprogram__c
+"replica".account

@@ -1,0 +1,512 @@
+■ IF079 definition : proactive
+■ IF079 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\proactive\IFHMBSAPCDPP0079Controller.java
+■ IF079 interfaceMapping    : /api/v1/HMBInboundRepairOrder
+■ IF079 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPCDPP0079Mapper.xml
+■ IF079 transferProcess     : process.if_in_repair_order(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF079 transferReplica     : null
+■ IF079 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPCDPP0079Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSAPCDPP0079Mapper">
+    <insert id="insertRepair" parameterType="IFHMBSAPCDPP0079Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_in_repair_order(
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , soid
+            , dealercode
+            , vincode
+            , mileage
+            , cpf
+            , opendt
+            , closedt
+            , status
+            , total_value
+        )values(
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{soid}
+            , #{dealercode}
+            , #{vincode}
+            , #{mileage}
+            , #{cpf}
+            , #{opendt}
+            , #{closedt}
+            , #{status}
+            , #{totalValue}
+        )
+    </insert>
+    <insert id="insertRepairService" parameterType="IFHMBSAPCDPP0079Dto">
+        insert into landing.if_in_repair_order_service(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , soid
+            , dealercode
+            , vincode
+            , itmnum
+            , sotype
+            , codsrc
+            , zdesc
+            , zqty
+            , value
+            , erdat
+            , erzet
+            , aedat
+            , aezet
+        )values
+        <foreach collection="listOfService" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.soid}
+                , #{item.dealercode}
+                , #{item.vincode}
+                , #{item.itmnum}
+                , #{item.sotype}
+                , #{item.codsrc}
+                , #{item.zdesc}
+                , #{item.zqty}
+                , #{item.value}
+                , #{item.erdat}::date
+                , #{item.erzet}::time
+                , #{item.aedat}::date
+                , #{item.aezet}::time
+            )
+        </foreach>
+    </insert>
+    <insert id="insertRepairPart" parameterType="IFHMBSAPCDPP0079Dto">
+        insert into landing.if_in_repair_parts(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , soid
+            , dealercode
+            , vincode
+            , itmnum
+            , sotype
+            , pncode
+            , zdesc
+            , zqty
+            , value
+            , erdat
+            , erzet
+            , aedat
+            , aezet
+        )values
+        <foreach collection="listOfParts" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.soid}
+                , #{item.dealercode}
+                , #{item.vincode}
+                , #{item.itmnum}
+                , #{item.sotype}
+                , #{item.pncode}
+                , #{item.zdesc}
+                , #{item.zqty}
+                , #{item.value}
+                , #{item.erdat}::date
+                , #{item.erzet}::time
+                , #{item.aedat}::date
+                , #{item.aezet}::time
+            )
+        </foreach>
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_in_repair_order(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare repair_ck int;
+	declare repair_servivce_ck int;
+	declare repair_service_rowid text[];
+	declare repair_service_ch int;
+	declare v_rsr_i integer;
+	declare v_rsr_len integer;
+	declare v_rsur_i integer;
+	declare v_rsur_len integer;
+	declare repair_ro_id varchar;
+	declare repair_part_rowid text[];
+	declare repair_part_ch int;
+	declare v_rpr_i integer;
+	declare v_rpr_len integer;
+	declare v_rpur_i integer;
+	declare v_rpur_len integer;
+	BEGIN
+		select 
+			count(*) into repair_ck
+		from 
+			landing.if_in_repair_order iiro
+		join
+			process.zhbrsdt1728 pz1728
+		on
+			iiro.soid = pz1728.soid and iiro.dealercode = pz1728.dealercode and iiro.vincode = pz1728.vincode
+		where 
+			row_id = CAST(param_id as INTEGER);
+		
+		if repair_ck > 0 then
+			update process.zhbrsdt1728 as pz1728 set
+				mileage = case when iiro.mileage isnull then pz1728.mileage else iiro.mileage end
+				, model = case when iiro.model isnull then pz1728.model else iiro.model end
+				, zyear = case when iiro.zyear isnull then pz1728.zyear else iiro.zyear end
+				, plate = case when iiro.plate isnull then pz1728.plate else iiro.plate end
+				, status = case when iiro.status isnull then pz1728.status else iiro.status end
+				, quicksrv = case when iiro.quicksrv isnull then pz1728.quicksrv else iiro.quicksrv end
+				, consult_cpf = case when iiro.consult_cpf isnull then pz1728.consult_cpf else iiro.consult_cpf end
+				, consult_name = case when iiro.consult_name isnull then pz1728.consult_name else iiro.consult_name end
+				, opendt = case when iiro.opendt isnull then pz1728.opendt else iiro.opendt end
+				, closedt = case when iiro.closedt isnull then pz1728.closedt else iiro.closedt end
+				, canceldt = case when iiro.canceldt isnull then pz1728.canceldt else iiro.canceldt end
+				, deliverydt = case when iiro.deliverydt isnull then pz1728.deliverydt else iiro.deliverydt end
+				, schedulingdt = case when iiro.schedulingdt isnull then pz1728.schedulingdt else iiro.schedulingdt end
+				, comments = case when iiro.comments isnull then pz1728.comments else iiro.comments end
+				, filesentdt = case when iiro.filesentdt isnull then pz1728.filesentdt else iiro.filesentdt end
+				, total_worked_hours = case when iiro.total_worked_hours isnull then pz1728.total_worked_hours else iiro.total_worked_hours end
+				, total_sold_hours = case when iiro.total_sold_hours isnull then pz1728.total_sold_hours else iiro.total_sold_hours end
+				, total_value = case when iiro.total_value isnull then pz1728.total_value else iiro.total_value end
+				, partner = case when iiro.partner isnull then pz1728.partner else iiro.partner end
+				, firstname = case when iiro.firstname isnull then pz1728.firstname else iiro.firstname end
+				, lastname = case when iiro.lastname isnull then pz1728.lastname else iiro.lastname end
+				, cpf = case when iiro.cpf isnull then pz1728.cpf else iiro.cpf end
+				, city = case when iiro.city isnull then pz1728.city else iiro.city end
+				, postl_cod1 = case when iiro.postl_cod1 isnull then pz1728.postl_cod1 else iiro.postl_cod1 end
+				, street = case when iiro.street isnull then pz1728.street else iiro.street end
+				, house_no = case when iiro.house_no isnull then pz1728.house_no else iiro.house_no end
+				, country = case when iiro.country isnull then pz1728.country else iiro.country end
+				, region = case when iiro.region isnull then pz1728.region else iiro.region end
+				, taxjurcode = case when iiro.taxjurcode isnull then pz1728.taxjurcode else iiro.taxjurcode end
+				, email = case when iiro.email isnull then pz1728.email else iiro.email end
+				, tel_number = case when iiro.tel_number isnull then pz1728.tel_number else iiro.tel_number end
+				, mob_number = case when iiro.mob_number isnull then pz1728.mob_number else iiro.mob_number end
+				, blockcontact = case when iiro.blockcontact isnull then pz1728.blockcontact else iiro.blockcontact end
+				, queried = case when iiro.queried isnull then pz1728.queried else iiro.queried end
+				, ernam = case when iiro.ernam isnull then pz1728.ernam else iiro.ernam end
+				, erdat = case when iiro.erdat isnull then pz1728.erdat else iiro.erdat end
+				, erzet = case when iiro.erzet isnull then pz1728.erzet else iiro.erzet end
+				, aenam = case when iiro.aenam isnull then pz1728.aenam else iiro.aenam end
+				, aedat = case when iiro.aedat isnull then pz1728.aedat else iiro.aedat end
+				, aezet = case when iiro.aezet isnull then pz1728.aezet else iiro.aezet end
+			from landing.if_in_repair_order as iiro
+			where
+				pz1728.soid = iiro.soid
+			and
+				pz1728.dealercode = iiro.dealercode
+			and
+				pz1728.vincode = iiro.vincode
+			and
+				iiro.row_id = CAST(param_id as INTEGER);
+				
+		else
+			select (soid||dealercode||vincode) into repair_ro_id from landing.if_in_repair_order as iiro where iiro.row_id = CAST(param_id as INTEGER);	
+		
+			insert into process.zhbrsdt1728(
+				soid
+				, dealercode
+				, vincode
+				, mileage
+				, model
+				, zyear
+				, plate
+				, status
+				, quicksrv
+				, consult_cpf
+				, consult_name
+				, opendt
+				, closedt
+				, canceldt
+				, deliverydt
+				, schedulingdt
+				, comments
+				, filesentdt
+				, total_worked_hours
+				, total_sold_hours
+				, total_value
+				, partner
+				, firstname
+				, lastname
+				, cpf
+				, city
+				, postl_cod1
+				, street
+				, house_no
+				, country
+				, region
+				, taxjurcode
+				, email
+				, tel_number
+				, mob_number
+				, blockcontact
+				, queried
+				, ernam
+				, erdat
+				, erzet
+				, aenam
+				, aedat
+				, aezet
+				, ro_id
+				, account_id
+				, asset_id
+			)select
+				soid
+				, dealercode
+				, vincode
+				, mileage
+				, model
+				, zyear
+				, plate
+				, status
+				, quicksrv
+				, consult_cpf
+				, consult_name
+				, opendt
+				, closedt
+				, canceldt
+				, deliverydt
+				, schedulingdt
+				, comments
+				, filesentdt
+				, total_worked_hours
+				, total_sold_hours
+				, total_value
+				, partner
+				, firstname
+				, lastname
+				, cpf
+				, city
+				, postl_cod1
+				, street
+				, house_no
+				, country
+				, region
+				, taxjurcode
+				, email
+				, tel_number
+				, mob_number
+				, blockcontact
+				, queried
+				, ernam
+				, erdat
+				, erzet
+				, aenam
+				, aedat
+				, aezet
+				, repair_ro_id
+				, (select row_id from process.account where cpf__c = cpf)
+				, (select row_id from process.asset where serialnumber = vincode)
+			from
+				landing.if_in_repair_order iiro 
+			where 
+				iiro.row_id = CAST(param_id as INTEGER);
+		end if;
+	
+		
+		--select repair_service_rowid(row_id::text) from landing.if_in_repair_order_service iiros where par_row_id = CAST(param_id as INTEGER);
+		
+		-- repair Service row_id 넣기
+		select array_agg(row_id::text) into repair_service_rowid from landing.if_in_repair_order_service iiros where par_row_id = CAST(param_id as INTEGER);
+		
+		v_rsr_len := array_length(repair_service_rowid, 1);	
+	
+		FOR v_rsr_i IN 1..v_rsr_len
+	     loop
+		     -- repair Service update 찾기
+			select 
+				count(iiros.row_id) into repair_service_ch
+			from 
+				landing.if_in_repair_order_service iiros
+			join
+				process.zhbrsdt1729 pz1729
+			on
+				iiros.soid = pz1729.soid and iiros.dealercode = pz1729.dealercode and iiros.vincode = pz1729.vincode and iiros.itmnum = pz1729.itmnum
+			where 
+				iiros.row_id = CAST(repair_service_rowid[v_rsr_i] as INTEGER);
+			
+			if 0 < repair_service_ch then
+				update process.zhbrsdt1729 as pz1729 set
+					sotype = case when iiros.sotype isnull then pz1729.sotype else iiros.sotype end
+					, codsrc = case when iiros.codsrc isnull then pz1729.codsrc else iiros.codsrc end
+					, zdesc = case when iiros.zdesc isnull then pz1729.zdesc else iiros.zdesc end
+					, zqty = case when iiros.zqty isnull then pz1729.zqty else iiros.zqty end
+					, unit = case when iiros.unit isnull then pz1729.unit else iiros.unit end
+					, value = case when iiros.value isnull then pz1729.value else iiros.value end
+					, total_value = case when iiros.total_value isnull then pz1729.total_value else iiros.total_value end
+					, ernam = case when iiros.ernam isnull then pz1729.ernam else iiros.ernam end
+					, erdat = case when iiros.erdat isnull then pz1729.erdat else iiros.erdat end
+					, erzet = case when iiros.erzet isnull then pz1729.erzet else iiros.erzet end
+					, aenam = case when iiros.aenam isnull then pz1729.aenam else iiros.aenam end
+					, aedat = case when iiros.aedat isnull then pz1729.aedat else iiros.aedat end
+					, aezet = case when iiros.aezet isnull then pz1729.aezet else iiros.aezet end
+				from 
+					landing.if_in_repair_order_service iiros
+				where 
+					pz1729.soid = iiros.soid
+				and
+					pz1729.dealercode = iiros.dealercode
+				and
+					pz1729.vincode = iiros.vincode
+				and
+					pz1729.itmnum = iiros.itmnum
+				and
+					iiros.row_id = CAST(repair_service_rowid[v_rsr_i] as INTEGER);
+			else
+				insert into process.zhbrsdt1729(
+					soid
+					, dealercode
+					, vincode
+					, itmnum
+					, sotype
+					, codsrc
+					, zdesc
+					, zqty
+					, unit
+					, value
+					, total_value
+					, ernam
+					, erdat
+					, erzet
+					, aenam
+					, aedat
+					, aezet
+					, ro_id
+					, ro_service_id
+				)select
+					soid
+					, dealercode
+					, vincode
+					, itmnum
+					, sotype
+					, codsrc
+					, zdesc
+					, zqty
+					, unit
+					, value
+					, total_value
+					, ernam
+					, erdat
+					, erzet
+					, aenam
+					, aedat
+					, aezet
+					, repair_ro_id
+					, soid||dealercode||vincode||itmnum
+				from 
+					landing.if_in_repair_order_service iiros
+				where
+					iiros.row_id = CAST(repair_service_rowid[v_rsr_i] as INTEGER);
+			end if;
+	     end loop;
+	    
+	   select array_agg(row_id::text) into repair_part_rowid from landing.if_in_repair_parts iirop where par_row_id = CAST(param_id as INTEGER);
+	    
+	   v_rpr_len := array_length(repair_part_rowid, 1);	
+	   
+	   FOR v_rpr_i IN 1..v_rpr_len
+	     loop
+	     	-- repair Service update 찾기
+			select 
+				count(iirop.row_id) into repair_part_ch
+			from 
+				landing.if_in_repair_parts iirop
+			join
+				process.zhbrsdt1730 pz1730
+			on
+				iirop.soid = pz1730.soid and iirop.dealercode = pz1730.dealercode and iirop.vincode = pz1730.vincode and iirop.itmnum = pz1730.itmnum
+			where 
+				iirop.row_id = CAST(repair_part_rowid[v_rpr_i] as INTEGER);
+			
+			if 0 < repair_part_ch then
+				update process.zhbrsdt1730 as pz1730 set
+					sotype = case when iirop.sotype isnull then pz1730.sotype else iirop.sotype end
+					, pncode = case when iirop.pncode isnull then pz1730.pncode else iirop.pncode end
+					, zdesc = case when iirop.zdesc isnull then pz1730.zdesc else iirop.zdesc end
+					, zqty = case when iirop.zqty isnull then pz1730.zqty else iirop.zqty end
+					, unit = case when iirop.unit isnull then pz1730.unit else iirop.unit end
+					, value = case when iirop.value isnull then pz1730.value else iirop.value end
+					, total_value = case when iirop.total_value isnull then pz1730.total_value else iirop.total_value end
+					, ernam = case when iirop.ernam isnull then pz1730.ernam else iirop.ernam end
+					, erdat = case when iirop.erdat isnull then pz1730.erdat else iirop.erdat end
+					, erzet = case when iirop.erzet isnull then pz1730.erzet else iirop.erzet end
+					, aenam = case when iirop.aenam isnull then pz1730.aenam else iirop.aenam end
+					, aedat = case when iirop.aedat isnull then pz1730.aedat else iirop.aedat end
+					, aezet = case when iirop.aezet isnull then pz1730.aezet else iirop.aezet end
+				from 
+					landing.if_in_repair_parts iirop
+				where 
+					pz1730.soid = iirop.soid
+				and
+					pz1730.dealercode = iirop.dealercode
+				and
+					pz1730.vincode = iirop.vincode
+				and
+					pz1730.itmnum = iirop.itmnum
+				and
+					iirop.row_id = CAST(repair_part_rowid[v_rpr_i] as INTEGER);
+			else
+				insert into process.zhbrsdt1730(
+					soid
+					, dealercode
+					, vincode
+					, itmnum
+					, sotype
+					, pncode
+					, zdesc
+					, zqty
+					, unit
+					, value
+					, total_value
+					, ernam
+					, erdat
+					, erzet
+					, aenam
+					, aedat
+					, aezet
+					, ro_id
+					, ro_parts_id
+				 )select
+				 	soid
+					, dealercode
+					, vincode
+					, itmnum
+					, sotype
+					, pncode
+					, zdesc
+					, zqty
+					, unit
+					, value
+					, total_value
+					, ernam
+					, erdat
+					, erzet
+					, aenam
+					, aedat
+					, aezet
+					, repair_ro_id
+					, soid||dealercode||vincode||itmnum
+				 from 
+					landing.if_in_repair_parts iirop
+				where
+					iirop.row_id = CAST(repair_part_rowid[v_rpr_i] as INTEGER);
+			end if;
+	     end loop;
+	     
+	END;
+

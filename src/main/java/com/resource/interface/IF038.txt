@@ -1,0 +1,210 @@
+■ IF038 definition : foundation
+■ IF038 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\foundation\IFHMBINNOCEANCDPP0033Controller.java
+■ IF038 interfaceMapping    : /api/v1/HMBGetVehicleWF
+■ IF038 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0033Mapper.xml
+■ IF038 transferProcess     : null
+■ IF038 transferReplica     : null
+■ IF038 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0033Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0033Mapper">
+    
+    <select id="getAsset" parameterType="IFHMBINNOCEANCDPP0033Dto" resultType="HMBVehicleDto">
+        select  
+            pa.row_id as assetId
+            , pa.serialnumber as vin
+            , pa.enginenumber__c as engineNumber
+            , pa.carregistrationnumber__c as licenseNumber
+            , pa.renavam_code__c as renavamCode
+            , pa.fsc__c as fscOcn
+            , pa.description  as description
+            , pa.manufacturedate as manufactureYear
+            , pa.modelyear__c as modelYear
+            , (select val from process.color_information ci where "type"= 'AUTO_INTERIOR' and lang_id__c= 'ENU' and name_code = pa.vehicleinternalcolor__c  limit 1) as internalColorCode
+            , (select val from process.color_information ci2 where "type"='AUTO_EXTERIOR' and lang_id__c= 'ENU' and name_code = pa.vehiclecolor__c limit 1) as externalColorCode
+            , pa.carregistrationnumber__c as vehicleLicenseNumber
+            , pa.fueltype__c as fuel
+            , pa.status as status
+          --  , TO_CHAR(pa.dealer_rcpt_dt__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') as saleToDealerDate
+            , case when pa.dealer_rcpt_dt__c notnull then to_char(pa.dealer_rcpt_dt__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') end as saleToDealerDate
+           -- , TO_CHAR(pa.billing_date__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') as billingDate
+            , case when pa.billing_date__c notnull then to_char(pa.billing_date__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') end as billingDate
+            , pa.cf_eval_svc_cd__c  as ccsFlg
+           -- , TO_CHAR(pa.warranty_start_dt__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') as warrantyStartDate
+            , case when pa.warranty_start_dt__c notnull then to_char(pa.warranty_start_dt__c,'YYYY-MM-DD"T"HH24:MI:SS-0300') end as warrantyStartDate
+            , pa.purch_loc_desc__c as fiscalReceipt
+            , (select row_id from process.account where dealercode__c = pa.dealercode__c limit 1) as dealerId
+            , pa.dealercode__c  as dealerCode
+            , (select "name" from process.account where dealercode__c = pa.dealercode__c limit 1) as dealerName
+            , (select corporaterepresentativename__c from process.account where dealercode__c = pa.dealercode__c limit 1) as dealerNickname
+            , a2.firstname  || ' ' || a2.lastname  as salesManName
+            , pp.chassi_model__c as model
+            , pa.oper_status_cd__c as negotiationType
+            , pa.dlr_con_int_id__c as salesManId
+            , pa.fsc__c as fsc_ocn
+            , pa.latestmileage__c as mileage
+            , a3.row_id  as AccountSearchId
+            , a2.row_id  as contactSearchId
+        from
+            process.asset pa
+        left join
+            process.customer_vehicle ac 
+        on
+            pa.row_id = ac.asset_id  and ac.status_cd = 'Active'
+        left join 
+            process.account a2 
+        on
+            ac.account_id  = a2.row_id  and ac.cv_type = 'Person'
+        left join 
+            process.account a3 
+        on
+            ac.account_id  = a3.row_id  and ac.cv_type = 'Business'
+        left join
+            process.product pp
+        on
+            pa.product2id = pp.row_id
+        where             
+            a3.registrysource__c = #{source}
+        <if test='idInterface == "1"'>
+        and    
+            pa.serialnumber = #{serialNumber}        
+        limit 1
+        </if>
+        <if test='idInterface == "2"'>
+        and    
+            pa.carregistrationnumber__c = #{licenseNumber}
+        limit 1
+        </if>
+        <if test='idInterface == "3"'>
+        and
+            pa.renavam_code__c = #{renavamCode}
+        </if>
+        <if test='idInterface == "4"'>
+        and
+            a2.cpf__c = #{cpf}
+        </if>
+        <if test='idInterface == "5"'>
+        and
+            a3.corporateregistrationnumber__c = #{cnpj}
+        </if>
+        <if test='idInterface == "6"'>
+        and
+            pa.billing_date__c between to_date(#{startDate}, 'YYYY-MM-DD') and to_date(#{endDate}, 'YYYY-MM-DD')
+        </if>
+        <if test='idInterface == "7"'>
+        and
+            pa.row_id = #{connexid}
+        limit 1
+        </if>
+        <if test='idInterface == "8"'>
+        and
+            pa.billing_date__c between to_date(#{startDate}, 'YYYY-MM-DD') and to_date(#{endDate}, 'YYYY-MM-DD')
+        </if>
+        <if test='idInterface == "9"'>
+        and
+            pa.billing_date__c between to_date(#{startDate}, 'YYYY-MM-DD') and to_date(#{endDate}, 'YYYY-MM-DD')
+        </if>
+        <if test='idInterface == "10"'>
+        and
+            pa.billing_date__c = to_date(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test='idInterface == "11"'>
+        and
+            pa.serialnumber like concat(#{serialNumber},'%')
+        </if>
+        <if test='idInterface == "12"'>
+        and
+            pa.billing_date__c between to_date(#{startDate}, 'YYYY-MM-DD') and to_date(#{endDate}, 'YYYY-MM-DD')
+        and 
+            a3.dealercode__c = #{dealerCode}
+        limit 1
+        </if>
+    </select>
+
+    <select id="getContact"  parameterType="IFHMBINNOCEANCDPP0033Dto" resultType="ContactDto">
+        select 
+            pc.row_id  as id
+            , pc.integrationId as integrationId
+            , pc.firstname as firstName
+            , pc.lastname as lastName
+            , pc.personbirthdate as birthDate
+            , pc.cpf__c as document
+            , pc.gender__pc as sex
+            , pc."type" as personType
+            , cc.mailingpostalcode as postalCode
+            , cc.mailingstreet as street
+            , cc.mailingstreet_2__c as number
+            , cc.mailingstreet_3__c as complement
+            , cc.mailingcountry  as county
+            , cc.mailingcity  as city
+            , cc.mailingstate  as state
+            , pc.personhomephone as homePhone
+            , pc.companyphone__pc as workPhone
+            , pc.personmobilephone as cellPhone
+            , pc.personemail  as emailAddress
+            , pac.relation_type_cd as relationshipType
+            , pac.status_cd as relationshipStatus
+        from 
+            process.account pc
+        join
+            process.contact cc
+        on 
+            pc.row_id = cc.account_row_id 
+        join
+            process.customer_vehicle pac 
+        on
+            pc.row_id  = pac.account_id  
+        join 
+            process.asset pa
+        on
+            pa.row_id  = pac.asset_id
+        where 
+            pc.row_id = #{contactInputId}
+        and
+        	pa.row_id = #{assetInputId}
+    </select>
+
+    <select id="getAccount"  parameterType="IFHMBINNOCEANCDPP0033Dto" resultType="AccountAssetDto">
+        select 
+            pc.row_id  as id
+            , pc.integrationId as integrationId
+            , pc.corporateregistrationnumber__c as cnpj
+            , pc.name as name
+            , pc.corporaterepresentativename__c as nickname
+            , pc.type as personType
+            , pc.billingpostalcode as zipCode
+            , pc.billingstreet as streetAddress
+            , pc.billingstreet_2__c as streetAddress2
+            , pc.billingstreet_3__c as streetAddress3
+            , pc.billingcity as city
+            , pc.billingstate as state
+            , pc.billingcountry as neighborhood
+            , pc.phone as mainPhone
+            , pc.fax as fax
+            , pc.emailaddress__c as mainEmailAddress
+            , paa.relation_type_cd  as relationshipType
+            , paa.status_cd as relationshipStatus
+        from
+            process.account pc
+        join
+            process.customer_vehicle paa
+        on
+            pc.row_id = paa.account_id  
+        join 
+            process.asset pa
+        on
+            paa.asset_id  = pa.row_id
+        where 
+            pc.row_id = #{accountInputId}
+        and
+            pa.row_id = #{assetInputId}
+    </select>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+process.contact
+process.account
+process.customer_vehicle
+process.color_information
+process.asset
+process.product

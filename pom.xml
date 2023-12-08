@@ -14,7 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 <!--    <postgresql.version>9.4-1200-jdbc41</postgresql.version>-->
  <postgresql.version>42.2.22</postgresql.version>
-     <gson.version>2.6.2</gson.version>
+     <gson.version>2.8.6</gson.version>
       <mybatis-spring.version>1.2.0</mybatis-spring.version>
       <org.springframework-version>4.3.10.RELEASE</org.springframework-version>
   </properties>
@@ -87,13 +87,6 @@
     <version>2.3.4.726</version>
 </dependency>
     
-    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-<dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.8.6</version>
-</dependency>
-    
  <dependency>
     <groupId>com.github.r4mz0r</groupId>
     <artifactId>cryptoutil</artifactId>
@@ -160,11 +153,11 @@
 
 
  <!--jasper studio library-->
-    <dependency>
-        <groupId>net.sf.jasperreports</groupId>
-        <artifactId>jasperreports</artifactId>
-        <version>6.11.0</version>
-    </dependency>
+<!--    <dependency>-->
+<!--        <groupId>net.sf.jasperreports</groupId>-->
+<!--        <artifactId>jasperreports</artifactId>-->
+<!--        <version>6.11.0</version>-->
+<!--    </dependency>-->
 
 
 
@@ -218,12 +211,14 @@
     <version>3.9</version>
 </dependency>
 
-
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.9</version>
-        </dependency>
+<!--        <dependency>-->
+<!--		    <groupId>net.sourceforge.pmd</groupId>-->
+<!--		    <artifactId>pmd-java</artifactId>-->
+<!--		    <version>6.50.0</version>-->
+<!--<version>6.0.0</version>-->
+<!--		</dependency>-->
         
     </dependencies>
+    
+    
 </project>

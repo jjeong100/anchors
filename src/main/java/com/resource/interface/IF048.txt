@@ -1,0 +1,257 @@
+■ IF048 definition : lead
+■ IF048 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\lead\IFHMBSAPEAICDPP0038Controller.java
+■ IF048 interfaceMapping    : /api/v1/HMBUpdateLeadWS
+■ IF048 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0038Mapper.xml
+■ IF048 transferProcess     : process.if_update_lead_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF048 transferReplica     : replica.if_update_lead_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF048 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBSAPEAICDPP0038Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBSAPEAICDPP0038Mapper">
+
+    <insert id="insertLead" parameterType="IFHMBSAPEAICDPP0038Dto"  useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_update_lead_ws(
+            protocol
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , "result"
+            , integrationid
+            , salesstatus
+            , salecpf
+            , status
+            , firstinterationdate
+            , salereason
+            , enddate
+            , dlrreceivedate
+            , dlrresponsetime
+            , pcd
+            , "source"
+            , schedvisit
+            , visitdate
+            , visitstat
+        )values(
+            #{protocol}
+            , now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{result}
+            , #{integrationId}
+            , #{salesStatus}
+            , #{saleCPF}
+            , #{status}
+            , #{firstInteractionDate}::timestamp
+            , #{saleReason}
+            , #{endDate}::timestamp
+            , #{dlrReceiveDate}::timestamp
+            , #{dlrResponseTime}
+            , #{pcd}
+            , #{source}
+            , #{schedvisit}::timestamp
+            , #{visitdate}::timestamp
+            , #{visitstat}
+        )
+    </insert>
+
+    <insert id="insertTemperature" parameterType="IFHMBSAPEAICDPP0038Dto">
+        insert into landing.if_update_lead_ws_temperature(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , temperaturenum
+            , temperature
+        )values
+        <foreach collection="listOfTemperature" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.temperatureNum}
+                , #{item.temperature}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertInteraction" parameterType="IFHMBSAPEAICDPP0038Dto">
+        insert into landing.if_update_lead_ws_interation(
+            par_row_id
+            , created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , interactionnum
+            , description
+            , "date"
+            , contactcustomer
+        )values
+        <foreach collection="listOfInteraction" item="item" separator=",">
+            (
+                #{rowId}
+                , now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{item.interactionNum}
+                , #{item.description}
+                , to_date(#{item.date}, 'YYYY-MM-DD')
+                , #{item.contactCustomer}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_update_lead_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <insert id="transferReplica" statementType="CALLABLE" parameterType="hashMap">
+        call replica.if_update_lead_ws(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+
+    <select id="getActionId" parameterType="IFHMBSAPEAICDPP0038Dto" resultType="String">
+        select
+            row_id as rowId
+        from
+            process.sales_consult_history psc
+        where
+            external_id__c = #{rowId}::text
+    </select>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare protocol_val varchar(30);
+	begin
+		
+	select protocol into protocol_val from landing.if_update_lead_ws where row_id = CAST(param_id AS INTEGER);	
+		
+		update process.opportunity as po set
+			predictive_temp__c = case when liulwt.temperature = 'F' then 'Hot' when liulwt.temperature = 'Q' then 'Cold' when liulwt.temperature = 'M' then 'Warm' else null end 
+			, TransferredOpportunity__c = true
+			, TransferredOpportunityDate__c = now()
+			, lostreason__c = liulw.salereason
+			, description = liulw."result"
+		from landing.if_update_lead_ws as liulw
+		join
+			landing.if_update_lead_ws_temperature as liulwt
+		on
+			liulw.row_id = liulwt.par_row_id 
+		where 
+			po.testdriveprotocolid__c = liulw.protocol 
+		and 
+			liulw.protocol = protocol_val;
+		
+		insert into process.sales_consult_history(
+			external_id__c
+			, description_interaction__c
+			, first_interaction_date__c
+			, contact_flag__c
+			, createddate
+			, salesstatus__c
+			, contactcustomer__c
+			, result__c
+			, source__c
+			, subsidiarycode__c
+			, pcd__c
+			, date__c
+			, salescpf__c
+			, visitdate__c
+			, visitstatus__c
+			, scheduledvisitdate__c
+			, protocolid__c
+		)select 
+			iulw.row_id
+			, iulw."result"
+			, iulw.firstinterationdate
+			, CASE when iulw.firstinterationdate notnull then true when iulw.firstinterationdate isnull then false else null end firstinterationdate
+			, iulw.created 
+		 	, iulw.salesstatus
+			, CASE when iulwi.contactcustomer='Y' then true when iulwi.contactcustomer='N' then false else null end contactcustomer
+			, iulw."result"
+			, iulw."source"
+			, 'HMB'
+			, CASE when iulw.pcd='Y' then true when iulw.pcd='N' then false else null end pcd
+			, iulw.dlrreceivedate
+			, iulw.salecpf
+			, iulw.visitdate
+			, iulw.visitstat
+			, iulw.schedvisit
+			, iulw.protocol
+		from
+			landing.if_update_lead_ws iulw
+		join
+			landing.if_update_lead_ws_interation iulwi
+		on
+			iulw.row_id = iulwi.par_row_id
+		where 
+			iulw.row_id = CAST(param_id AS INTEGER)
+		limit 1
+		;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ replica ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare protocol_val varchar(30);
+	begin
+		
+	select protocol into protocol_val from landing.if_update_lead_ws where row_id = CAST(param_id AS INTEGER);
+		
+		update "replica".opportunity as ro set
+			predictive_temp__c = po.predictive_temp__c 
+			, TransferredOpportunity__c = po.TransferredOpportunity__c
+			, TransferredOpportunityDate__c = po.TransferredOpportunityDate__c
+			, lostreason__c = po.lostreason__c
+			, description = po.description
+		from process.opportunity as po 
+		where 
+			ro.testdriveprotocolid__c = protocol_val;
+		
+		
+		insert into "replica".salesconsulthistory__c(
+			external_id__c
+			, descriptioninteraction__c
+			, firstinteractiondate__c
+			, contact_flag__c
+			, createddate
+			, salesstatus__c
+			, contactcustomer__c
+			, result__c
+			, source__c
+			, subsidiarycode__c
+			, pcd__c
+		--	, date__c
+			, salescpf__c
+			, visitdate__c
+			, visitstatus__c
+			, scheduledvisitdate__c
+			, opportunity__r__autonumberforname__c
+		)
+		select 
+			row_id
+			, description_interaction__c
+			, first_interaction_date__c
+			, contact_flag__c
+			, createddate
+			, salesstatus__c
+			, contactcustomer__c
+			, result__c
+			, source__c
+			, subsidiarycode__c
+			, pcd__c
+		--	, date__c
+			, salescpf__c
+			, visitdate__c
+			, visitstatus__c
+			, scheduledvisitdate__c
+			, (select autonumberforname__c from "replica".opportunity where testdriveprotocolid__c = protocolid__c)
+		from
+			process.sales_consult_history
+		where 
+			external_id__c = param_id;
+	END;
+

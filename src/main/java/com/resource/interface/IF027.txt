@@ -1,0 +1,158 @@
+■ IF027 definition : proactive
+■ IF027 interfaceController : D:\workspace\cdpp-app\src\main\java\com\hyundaimotors\hmb\cdppapp\controller\proactive\IFHMBINNOCEANCDPP0024Controller.java
+■ IF027 interfaceMapping    : /api/v1/HMBMNTSRVCManageEmployeeAvailabilityExcp
+■ IF027 mapper xml          : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0024Mapper.xml
+■ IF027 transferProcess     : process.if_mntsrvc_mng_emp_avail_excp(#{PARAM_ID,jdbcType=VARCHAR,mode=IN})
+■ IF027 transferReplica     : null
+■ IF027 interfacePayload     : D:\workspace\cdpp-app\src\main\resources\com\hyundaimotors\hmb\cdppapp\mapper\IFHMBINNOCEANCDPP0024Payload.java
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ query ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundaimotors.hmb.cdppapp.mapper.IFHMBINNOCEANCDPP0024Mapper">
+
+    <insert id="insertObject" parameterType="IFHMBINNOCEANCDPP0024Dto" useGeneratedKeys="true" keyProperty="rowId" keyColumn="row_id">
+        insert into landing.if_mntsrvc_manage_emp_avail_excp(
+            created
+            , created_by
+            , last_upd
+            , last_upd_by
+            , operation
+            , excp_id
+            , employee_cpf
+            , dealer_code
+            , excp_start_date
+            , excp_end_date
+            , absence_period
+            , period1_start
+            , period1_end
+            , period2_start
+            , period2_end
+            , period3_start
+            , period3_end
+            , excp_desc
+            , "source"
+        )values(
+            now()
+            , 'interface'
+            , now()
+            , 'interface'
+            , #{operation}
+            , #{excpId}
+            , #{employeeCPF}
+            , #{dealerCode}
+            , #{excpStartDate}::timestamp
+            , #{excpEndDate}::timestamp
+            , #{absencePeriod}
+            , #{period1Start}
+            , #{period1End}
+            , #{period2Start}
+            , #{period2End}
+            , #{period3Start}
+            , #{period3End}
+            , #{excpDesc}
+            , #{source}
+        )
+    </insert>
+
+    <insert id="transferProcess" statementType="CALLABLE" parameterType="hashMap">
+        call process.if_mntsrvc_mng_emp_avail_excp(#{PARAM_ID,jdbcType=VARCHAR,mode=IN});
+    </insert>
+</mapper>
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ process ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+	declare checkoperation varchar(20);
+	declare dealercode varchar;
+	declare checkrowid varchar;
+	BEGIN
+		select 
+			lower(limmeae.operation), limmeae.dealer_code  into checkoperation, dealercode
+		from 
+			landing.if_mntsrvc_manage_emp_avail_excp limmeae 
+		where 
+			limmeae.row_id = CAST(param_id AS INTEGER); 
+
+		
+		IF checkoperation = 'delete' then
+			delete from process.maintenanceable_availability pm
+			where
+				dealer_code = dealercode;
+		end if;
+	
+		IF checkoperation = 'upsert' then
+			select pm.row_id  into checkrowid 
+			from process.maintenanceable_availability pm
+			join landing.if_mntsrvc_manage_emp_avail_excp lm
+			on pm.dealer_code = lm.dealer_code 
+			where lm.row_id = cast(Param_id as Integer);
+		
+			if checkrowid isnull then
+				insert into process.maintenanceable_availability
+					(
+						created
+						, created_by
+						, last_upd
+						, last_upd_by
+						, employee_cpf
+						, dealer_code
+						, excp_start_date
+						, excp_end_date
+						, absence_period
+						, period1_start
+						, period1_end
+						, period2_start
+						, period2_end
+						, period3_start
+						, period3_end 
+						, excp_desc
+						, "source"
+					)
+					select
+						now()
+		                , 'interface'
+		                , now()
+		                , 'interface'
+		                , limmeae.employee_cpf
+		                , limmeae.dealer_code
+		                , limmeae.excp_start_date
+		                , limmeae.excp_end_date
+		                , limmeae.absence_period
+		                , limmeae.period1_start
+						, limmeae.period1_end
+						, limmeae.period2_start
+						, limmeae.period2_end
+						, limmeae.period3_start
+						, limmeae.period3_end
+						, limmeae.excp_desc
+						, 'source'
+					from 
+						landing.if_mntsrvc_manage_emp_avail_excp limmeae
+					where 
+						limmeae.row_id = CAST(param_id AS INTEGER); 
+						
+			else 
+				update process.maintenanceable_availability as pma set
+					excp_start_date = limmeae.excp_start_date
+					, excp_end_date = limmeae.excp_end_date
+					, absence_period = limmeae.absence_period
+					, period1_start = limmeae.period1_start
+					, period1_end = limmeae.period1_end
+					, period2_start = limmeae.period2_start
+					, period2_end = limmeae.period2_end
+					, period3_start = limmeae.period3_start
+					, period3_end = limmeae.period3_end
+					from 
+						landing.if_mntsrvc_manage_emp_avail_excp limmeae
+					where 
+						limmeae.row_id = CAST(param_id AS INTEGER)
+					and 
+						pma.row_id = checkrowid;
+					
+					
+			end if;
+		end if;
+	END;
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 테스트 로컬 사용테이블 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+landing.if_mntsrvc_manage_emp_avail_excp(
+landing.if_mntsrvc_manage_emp_avail_excp
+process.maintenanceable_availability

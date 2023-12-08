@@ -23,7 +23,7 @@ public class 프로시져점검 {
 //        String serviceName = "prod_prod";//
 //        String serverType  = "server";
         
-        Connection conn = PostgreSql.Connection(serviceName, serverType,false,serviceName);
+        Connection conn = PostgreSql.Connection(serviceName, serverType,true);
                 
         try {
         	String schema    = "replica";
@@ -58,7 +58,7 @@ public class 프로시져점검 {
     	System.out.println("■procedure : " + split[1]);
     	System.out.println("■param : " + param);
     	
-    	return Process( conn, split[0], split[1], param);
+    	return Process( conn, split[0].toLowerCase(), split[1], param);
     }
     
      /**
@@ -72,7 +72,7 @@ public class 프로시져점검 {
     	
     	for(int index=0;index<listData.size();index++) {
     		LinkedHashMap<String,String> data = listData.get(index);
-    		System.out.println(data.get("prosrc"));
+//    		System.out.println(data.get("prosrc"));
     		result.append(data.get("prosrc"));
     	}
     	

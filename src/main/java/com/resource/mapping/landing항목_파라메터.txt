@@ -1,0 +1,8 @@
+now()
+                , 'interface'
+                , now()
+                , 'interface'
+                , #{name}
+                , #{source}
+                , #{type}
+                , #{suggestedPrice}

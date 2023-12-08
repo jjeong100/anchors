@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,18 +29,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.google.common.base.CaseFormat;
 import com.google.gson.Gson;
@@ -1387,44 +1374,44 @@ public static List<String> getFileReadListComent(String path) {
         return result;
     }
     
-    /**
-     * 
-     */
-    public static void xmlXPath(String path) {
-         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-         factory.setNamespaceAware(true);
-         DocumentBuilder builder;
-         Document doc = null;
-
-        try {
-            // xml 파싱하기
-//            Reader reader = new Reader();
-            Reader r = new FileReader(path);
-            InputSource is = new InputSource(r);
-            builder = factory.newDocumentBuilder();
-            doc = builder.parse(is);
-            XPathFactory xpathFactory = XPathFactory.newInstance();
-            XPath xpath = xpathFactory.newXPath();
-            // XPathExpression expr = xpath.compile("/response/body/items/item");
-            XPathExpression expr = xpath.compile("//mapper");
-            
-            NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                NodeList child = nodeList.item(i).getChildNodes();
-                for (int j = 0; j < child.getLength(); j++) {
-                    Node node = child.item(j);
-                    System.out.println("현재 노드 이름 : " + node.getNodeName());
-                    System.out.println("현재 노드 타입 : " + node.getNodeType());
-//                    System.out.println("현재 노드 값 : " + node.getTextContent());
-                    System.out.println("현재 노드 네임스페이스 : " + node.getPrefix());
-                    System.out.println("현재 노드의 다음 노드 : " + node.getNextSibling());
-                    System.out.println("");
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+//    /**
+//     * 
+//     */
+//    public static void xmlXPath(String path) {
+//         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//         factory.setNamespaceAware(true);
+//         DocumentBuilder builder;
+//         Document doc = null;
+//
+//        try {
+//            // xml 파싱하기
+////            Reader reader = new Reader();
+//            Reader r = new FileReader(path);
+//            InputSource is = new InputSource(r);
+//            builder = factory.newDocumentBuilder();
+//            doc = builder.parse(is);
+//            XPathFactory xpathFactory = XPathFactory.newInstance();
+//            XPath xpath = xpathFactory.newXPath();
+//            // XPathExpression expr = xpath.compile("/response/body/items/item");
+//            XPathExpression expr = xpath.compile("//mapper");
+//            
+//            NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+//            for (int i = 0; i < nodeList.getLength(); i++) {
+//                NodeList child = nodeList.item(i).getChildNodes();
+//                for (int j = 0; j < child.getLength(); j++) {
+//                    Node node = child.item(j);
+//                    System.out.println("현재 노드 이름 : " + node.getNodeName());
+//                    System.out.println("현재 노드 타입 : " + node.getNodeType());
+////                    System.out.println("현재 노드 값 : " + node.getTextContent());
+//                    System.out.println("현재 노드 네임스페이스 : " + node.getPrefix());
+//                    System.out.println("현재 노드의 다음 노드 : " + node.getNextSibling());
+//                    System.out.println("");
+//                }
+//            }
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
     
     /**
      * kd
