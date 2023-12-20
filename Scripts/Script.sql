@@ -1,14 +1,14 @@
-select * from process.account
-limit 1
+select attach_file,url,c.* from process."case" c 
+where 1=1
+--and attach_file notnull 
+and protocol__c = 'HMB8739974017'
+;
+update process."case" set attach_file = null
+where 1=1
+--and attach_file notnull 
+and protocol__c = 'HMB8739974017'
+
 ;
 select * from process.if_info_logs iil 
-;
-select * from process.asset a 
-limit 1
+order by created_at desc
 
-;
-select count(*) as cnt from information_schema.tables
-where table_name = 'file_search'
-
-;
-select * from file_search
